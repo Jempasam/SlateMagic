@@ -246,7 +246,7 @@ object AdvancedParticle {
      * @param velocity The velocity of the particles, added to the random motion
      * @param count The number of particles to spawn
      */
-    fun cloud_boom(world: World, effect: ParticleEffect, center: Vec3d, speed: Vec3d, velocity: Vec3d, count: Int)
+    fun cloudboom(world: World, effect: ParticleEffect, center: Vec3d, speed: Vec3d, velocity: Vec3d, count: Int)
     {
         for(i in 0..<count){
             val speed= Vec3d(
@@ -294,25 +294,25 @@ object AdvancedParticle {
      */
     fun tornado(world: World, effect: ParticleEffect, center: Vec3d, size: Vec3d, velocity: Vec3d, count: Int) {
         val direction=if(Random.nextBoolean()) -1 else 1
-        val angle_per_particle=((Math.PI*2*count/30)/count)*direction
-        val x_per_particle=size.x/count
-        val y_per_particle=size.y/count
-        val z_per_particle=size.z/count
+        val anglePerParticle=((Math.PI*2*count/30)/count)*direction
+        val xPerParticle=size.x/count
+        val yPerParticle=size.y/count
+        val zPerParticle=size.z/count
 
-        val start_angle=Random.nextFloat()*Math.PI*2
+        val startAngle=Random.nextFloat()*Math.PI*2
         for (i in 1 .. count) {
-            val angle = start_angle + angle_per_particle*i
+            val angle = startAngle + anglePerParticle*i
             val cos=Math.cos(angle)
             val sin=Math.sin(angle)
             val pos = Vec3d(
-                center.x + x_per_particle * i * cos,
-                center.y + y_per_particle * i,
-                center.z + z_per_particle * i * sin
+                center.x + xPerParticle * i * cos,
+                center.y + yPerParticle * i,
+                center.z + zPerParticle * i * sin
             )
             val speed = Vec3d(
-                velocity.x + x_per_particle * i / 5 * sin*direction,
-                velocity.y + y_per_particle * i / 10,
-                velocity.z + z_per_particle * i / 5 * -cos*direction
+                velocity.x + xPerParticle * i / 5 * sin*direction,
+                velocity.y + yPerParticle * i / 10,
+                velocity.z + zPerParticle * i / 5 * -cos*direction
             )
             world.addParticle(effect, pos.x, pos.y, pos.z, speed.x, speed.y, speed.z)
         }

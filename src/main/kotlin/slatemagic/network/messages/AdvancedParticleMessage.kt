@@ -15,7 +15,7 @@ import slatemagic.SlateMagicMod
 import slatemagic.network.NetworkMessage
 import slatemagic.network.ServerNetwork
 
-class AdvancedParticleMessage(val effect: ParticleEffect, val world: RegistryKey<World>, val from: Vec3d, val to: Vec3d, val speed: Vec3d,val spreading_or_count: Double):
+class AdvancedParticleMessage(val effect: ParticleEffect, val world: RegistryKey<World>, val from: Vec3d, val to: Vec3d, val speed: Vec3d,val spreadingOrCount: Double):
     NetworkMessage {
 
     constructor(packet: PacketByteBuf): this(
@@ -41,7 +41,7 @@ class AdvancedParticleMessage(val effect: ParticleEffect, val world: RegistryKey
         buf.writeDouble(speed.x)
         buf.writeDouble(speed.y)
         buf.writeDouble(speed.z)
-        buf.writeDouble(spreading_or_count)
+        buf.writeDouble(spreadingOrCount)
         return buf
     }
 

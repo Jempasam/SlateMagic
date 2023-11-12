@@ -96,24 +96,24 @@ class SpellShape(private val circles: Array<Circle>) {
             // Circle Data
             val circle= circles[ci]
             val nangle=(angle+PI/2*ci).let { if(ci%2==0) it else 2*PI-it }
-            val angle_step=2*PI/circle.cornerCount
+            val angleStep=2*PI/circle.cornerCount
             val succionDepth=circle.succionDepth.toDouble()*nradius/100.0
             val succionStep=if(circle.succionCount==0.toByte()) 0 else circle.cornerCount/circle.succionCount
 
             // Circle traces
             for (i in 0 until circle.repetition) {
-                val repetition_offset=i*0.1
+                val repetitionOffset=i*0.1
                 // Draw Shape
                 if(circle.cornerCount<=0.toByte())break
                 for (j in 0 .. circle.cornerCount) {
                     val id=j%circle.cornerCount
                     // Succion
-                    val point_radius=
-                        if(succionStep>0 && id%succionStep==0) nradius-succionDepth-repetition_offset
-                        else nradius-repetition_offset
+                    val pointRadius=
+                        if(succionStep>0 && id%succionStep==0) nradius-succionDepth-repetitionOffset
+                        else nradius-repetitionOffset
 
-                    val px=x + point_radius * cos(nangle+angle_step*id)
-                    val py=y + point_radius * sin(nangle+angle_step*id)
+                    val px=x + pointRadius * cos(nangle+angleStep*id)
+                    val py=y + pointRadius * sin(nangle+angleStep*id)
                     painter.add(px, py)
                 }
                 painter.stop()
@@ -125,16 +125,16 @@ class SpellShape(private val circles: Array<Circle>) {
                 for (j in 0 until circle.subCircleCount) {
                     val id=(j*circle.subCircleCount/circle.cornerCount)%circle.cornerCount
                     // Succion
-                    val point_radius=
+                    val pointRadius=
                         if(succionStep>0 && id%succionStep==0) radius-succionDepth
                         else nradius
 
                     val corner= j*circle.cornerCount/circle.subCircleCount
-                    val px= x + point_radius * cos(nangle+angle_step*corner)
-                    val py= y + point_radius * sin(nangle+angle_step*corner)
+                    val px= x + pointRadius * cos(nangle+angleStep*corner)
+                    val py= y + pointRadius * sin(nangle+angleStep*corner)
 
-                    val sub_radius=circle.subCircleRadius/100.0*nradius
-                    draw(painter, px, py, sub_radius, nangle-j*PI*2/circle.subCircleCount, ci+1)
+                    val subRadius=circle.subCircleRadius/100.0*nradius
+                    draw(painter, px, py, subRadius, nangle-j*PI*2/circle.subCircleCount, ci+1)
                 }
             }
             nradius -= circle.spacing/100.0

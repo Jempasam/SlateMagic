@@ -11,49 +11,49 @@ object SlateMagicClientNetwork {
     init{
         /* LINE */
         ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.LINE, particleHandler {
-            AdvancedParticle.line(it, effect, from, to, speed, spreading_or_count)
+            AdvancedParticle.line(it, effect, from, to, speed, spreadingOrCount)
         })
         ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.LIGHTNING, particleHandler {
-            AdvancedParticle.lightning(it, effect, from, to, speed, spreading_or_count.toInt())
+            AdvancedParticle.lightning(it, effect, from, to, speed, spreadingOrCount.toInt())
         })
         ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.CURVE, particleHandler {
-            AdvancedParticle.curve(it, effect, from, to, speed, spreading_or_count)
+            AdvancedParticle.curve(it, effect, from, to, speed, spreadingOrCount)
         })
 
         /* BOX */
         ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.BOX, particleHandler {
-            AdvancedParticle.box(it, effect, from, to, speed, spreading_or_count.toInt())
+            AdvancedParticle.box(it, effect, from, to, speed, spreadingOrCount.toInt())
         })
         ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.CLOUD, particleHandler {
-            AdvancedParticle.cloud(it, effect, from, to, speed, spreading_or_count.toInt())
+            AdvancedParticle.cloud(it, effect, from, to, speed, spreadingOrCount.toInt())
         })
 
         /* BOOM AND MOVING ZONE*/
         ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.BOOM, particleHandler {
-            AdvancedParticle.boom(it, effect, from, to, speed, spreading_or_count.toInt())
+            AdvancedParticle.boom(it, effect, from, to, speed, spreadingOrCount.toInt())
         })
         ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.CLOUD_BOOM, particleHandler {
-            AdvancedParticle.cloud_boom(it, effect, from, to, speed, spreading_or_count.toInt())
+            AdvancedParticle.cloudboom(it, effect, from, to, speed, spreadingOrCount.toInt())
         })
         ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.IMPLODE, particleHandler {
-            AdvancedParticle.implode(it, effect, from, to, speed, spreading_or_count.toInt())
+            AdvancedParticle.implode(it, effect, from, to, speed, spreadingOrCount.toInt())
         })
         ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.SPIRAL, particleHandler {
-            AdvancedParticle.spiral(it, effect, from, to, speed, spreading_or_count.toInt())
+            AdvancedParticle.spiral(it, effect, from, to, speed, spreadingOrCount.toInt())
         })
         ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.STORM, particleHandler {
-            AdvancedParticle.storm(it, effect, from, to, speed, spreading_or_count.toInt())
+            AdvancedParticle.storm(it, effect, from, to, speed, spreadingOrCount.toInt())
         })
 
         /* RING */
         ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.TORNADO, particleHandler {
-            AdvancedParticle.tornado(it, effect, from, to, speed, spreading_or_count.toInt())
+            AdvancedParticle.tornado(it, effect, from, to, speed, spreadingOrCount.toInt())
         })
         ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.RING, particleHandler {
-            AdvancedParticle.ring(it, effect, from, to, speed, spreading_or_count.toInt())
+            AdvancedParticle.ring(it, effect, from, to, speed, spreadingOrCount.toInt())
         })
         ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.SHOCKWAVE, particleHandler {
-            AdvancedParticle.shockwave(it, effect, from, to, speed, spreading_or_count.toInt())
+            AdvancedParticle.shockwave(it, effect, from, to, speed, spreadingOrCount.toInt())
         })
 
     }
