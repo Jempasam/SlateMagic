@@ -8,25 +8,25 @@ import net.minecraft.world.World
 import slatemagic.network.messages.AdvancedParticleMessage
 import slatemagic.network.messages.sendParticleEffect
 import slatemagic.particle.MagicParticleEffect
-import slatemagic.spell.Spell
 import slatemagic.spell.SpellContext
+import slatemagic.spell.effect.SpellEffect
 
 class SpellTurretEntity : SimpleSpellEntity{
 
 
     private var cadency=0
     private var time=0
-    private var remaining_shoot=5
+    private var remainingShoot=5
 
 
     constructor(type: EntityType<*>, world: World) : super(type, world)
 
-    constructor(type: EntityType<*>, world: World, spell: Spell, power: Int, cadency: Int, remaining_shoot: Int)
+    constructor(type: EntityType<*>, world: World, spell: SpellEffect, power: Int, cadency: Int, remainingShoot: Int)
             : super(type, world, spell, power)
     {
         this.cadency = cadency
         this.time = cadency
-        this.remaining_shoot = remaining_shoot
+        this.remainingShoot = remainingShoot
     }
 
 
@@ -37,9 +37,9 @@ class SpellTurretEntity : SimpleSpellEntity{
             world as ServerWorld
             time--
             if(time<0){
-                if(remaining_shoot<=0) kill()
+                if(remainingShoot<=0) kill()
                 time=cadency
-                remaining_shoot--
+                remainingShoot--
 
                 val color=this.spell.color
                 val power=this.power
@@ -53,7 +53,7 @@ class SpellTurretEntity : SimpleSpellEntity{
                 )
                 spell.use(SpellContext.at(this, power))
 
-                if(remaining_shoot<=0) kill()
+                if(remainingShoot<=0) kill()
             }
         }
     }
@@ -62,13 +62,13 @@ class SpellTurretEntity : SimpleSpellEntity{
         super.readCustomDataFromNbt(nbt)
         cadency=nbt.getInt("cadency")
         time=nbt.getInt("time")
-        remaining_shoot=nbt.getInt("remaining_shoot")
+        remainingShoot=nbt.getInt("remaining_shoot")
     }
 
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
         super.writeCustomDataToNbt(nbt)
         nbt.putInt("cadency", cadency)
         nbt.putInt("time", time)
-        nbt.putInt("remaining_shoot", remaining_shoot)
+        nbt.putInt("remaining_shoot", remainingShoot)
     }
 }

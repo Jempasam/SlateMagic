@@ -9,17 +9,17 @@ import net.minecraft.command.CommandRegistryAccess
 import slatemagic.SlateMagicModClient
 import slatemagic.command.type.RegistryArgumentType
 import slatemagic.registry.SlateMagicRegistry
-import slatemagic.spell.PrecalculatedSpell
-import slatemagic.spell.Spell
+import slatemagic.spell.effect.PrecalculatedSpellEffect
+import slatemagic.spell.effect.SpellEffect
 
 
 object SlateMagicClientCommands {
 
     val SPELL= literal("spellcli").then(
-        argument("spell",RegistryArgumentType(SlateMagicRegistry.SPELLS)).then(
+        argument("spell",RegistryArgumentType(SlateMagicRegistry.EFFECTS)).then(
             literal("show").executes { context ->
-                val spell=context.getArgument("spell",Spell::class.java)
-                SlateMagicModClient.spell = PrecalculatedSpell(spell)
+                val spell=context.getArgument("spell", SpellEffect::class.java)
+                SlateMagicModClient.spell = PrecalculatedSpellEffect(spell)
                 SlateMagicModClient.lastTime = System.currentTimeMillis()
                 1
             }

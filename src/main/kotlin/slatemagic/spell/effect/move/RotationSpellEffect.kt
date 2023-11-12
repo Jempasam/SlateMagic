@@ -1,4 +1,4 @@
-package slatemagic.spell.move
+package slatemagic.spell.effect.move
 
 import net.minecraft.text.Text
 import net.minecraft.util.math.MathHelper.lerp
@@ -9,11 +9,11 @@ import slatemagic.network.messages.sendParticleEffect
 import slatemagic.particle.SlateMagicParticles
 import slatemagic.particle.SpellCircleParticleEffect
 import slatemagic.shape.SpellShape
-import slatemagic.spell.Spell
+import slatemagic.spell.effect.SpellEffect
 import slatemagic.spell.SpellContext
 import kotlin.random.Random
 
-class RotationSpell(val minimum: Vec2f, val maximum: Vec2f, val decorated: Spell): Spell {
+class RotationSpellEffect(val minimum: Vec2f, val maximum: Vec2f, val decorated: SpellEffect): SpellEffect {
 
     override fun use(context: SpellContext): SpellContext? {
         val rot=Vec2f(

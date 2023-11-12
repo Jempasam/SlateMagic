@@ -1,4 +1,4 @@
-package slatemagic.spell.move
+package slatemagic.spell.effect.move
 
 import net.minecraft.text.Text
 import net.minecraft.util.math.Vec3d
@@ -9,12 +9,12 @@ import slatemagic.network.messages.AdvancedParticleMessage
 import slatemagic.network.messages.sendParticleEffect
 import slatemagic.particle.MagicParticleEffect
 import slatemagic.shape.SpellShape
-import slatemagic.spell.Spell
+import slatemagic.spell.effect.SpellEffect
 import slatemagic.spell.SpellContext
 import kotlin.math.cbrt
 import kotlin.math.sqrt
 
-class TrapSpell(val range: Float, val count: Int, val decorated: Spell): Spell {
+class TrapSpellEffect(val range: Float, val count: Int, val decorated: SpellEffect): SpellEffect {
 
     override fun use(context: SpellContext): SpellContext? {
         val levelRange=range* cbrt(context.power.toFloat())
@@ -27,7 +27,7 @@ class TrapSpell(val range: Float, val count: Int, val decorated: Spell): Spell {
             context.pos,
             AdvancedParticleMessage.SHOCKWAVE,
             Vec3d(1.0,0.0,1.0),
-            15.0
+            15.0*range
         )
         return SpellContext.at(trap,context.power)
     }

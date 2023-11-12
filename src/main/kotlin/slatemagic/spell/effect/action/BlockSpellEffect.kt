@@ -1,4 +1,4 @@
-package slatemagic.spell.action
+package slatemagic.spell.effect.action
 
 import net.minecraft.block.Block
 import net.minecraft.text.Text
@@ -6,10 +6,10 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3f
 import slatemagic.helper.ColorTools
 import slatemagic.shape.SpellShape
-import slatemagic.spell.Spell
+import slatemagic.spell.effect.SpellEffect
 import slatemagic.spell.SpellContext
 
-class BlockSpell(val block: Block): Spell {
+class BlockSpellEffect(val block: Block): SpellEffect {
 
     override fun use(context: SpellContext): SpellContext? {
         context.world.setBlockState(BlockPos(context.pos),block.defaultState)

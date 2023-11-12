@@ -6,14 +6,14 @@ import net.minecraft.util.Identifier
 import slatemagic.helper.ColorTools
 import slatemagic.registry.SlateMagicRegistry
 import slatemagic.shape.SpellShape
-import slatemagic.spell.Spell
-import slatemagic.spell.StubSpell
+import slatemagic.spell.effect.SpellEffect
+import slatemagic.spell.effect.StubSpellEffect
 
 interface SpellEntity {
 
     val spellData: Data
 
-    var spell: Spell
+    var spell: SpellEffect
         get() = spellData.spell
         set(v) { spellData.spell = v }
 
@@ -21,17 +21,17 @@ interface SpellEntity {
         get() = spellData.power
         set(v) { spellData.power = v }
 
-    class Data(var spell: Spell, var power: Int){
+    class Data(var spell: SpellEffect, var power: Int){
 
-        constructor(): this(StubSpell.INSTANCE, 1)
+        constructor(): this(StubSpellEffect.INSTANCE, 1)
 
         fun read(buf: PacketByteBuf){
             try{
                 power=buf.readInt()
                 val shape=SpellShape(buf.readString())
-                spell=StubSpell(ColorTools.vec(buf.readInt()), shape)
+                spell= StubSpellEffect(ColorTools.vec(buf.readInt()), shape)
             }catch (e: Exception){
-                spell=StubSpell.INSTANCE
+                spell= StubSpellEffect.INSTANCE
                 power=1
             }
         }
@@ -45,13 +45,13 @@ interface SpellEntity {
         fun read(nbt: NbtCompound){
             spell=nbt.getString("spell")
                 ?.let { Identifier.tryParse(it) }
-                ?.let { SlateMagicRegistry.SPELLS.get(it) }
-                ?: StubSpell.INSTANCE
+                ?.let { SlateMagicRegistry.EFFECTS.get(it) }
+                ?: StubSpellEffect.INSTANCE
             power=nbt.getInt("power")
         }
 
         fun write(nbt: NbtCompound){
-            spell.let{SlateMagicRegistry.SPELLS.getId(it)}
+            spell.let{SlateMagicRegistry.EFFECTS.getId(it)}
                 ?.let { nbt.putString("spell", it.toString()) }
             nbt.putInt("power", power)
         }

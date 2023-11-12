@@ -41,7 +41,7 @@ class SpellTrapRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<Spe
 
         run{
             val painter=CircleVertexPainter(EntityVPC(vertexes,matrix.peek().positionMatrix), DyeColor.WHITE.fireworkColor,0.05f/range)
-            spell.shape.draw(painter, entity.age.toDouble()/10.0/range)
+            spell.shape.draw(painter, (entity.age.toDouble()+tickDelta)/10.0/range)
         }
 
         matrix.pop()

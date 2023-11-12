@@ -1,12 +1,13 @@
-package slatemagic.spell
+package slatemagic.spell.effect
 
 import net.minecraft.text.Text
 import net.minecraft.util.DyeColor
 import net.minecraft.util.math.Vec3f
 import slatemagic.helper.ColorTools
 import slatemagic.shape.SpellShape
+import slatemagic.spell.SpellContext
 
-class StubSpell(override val color: Vec3f, override val shape: SpellShape): Spell{
+class StubSpellEffect(override val color: Vec3f, override val shape: SpellShape): SpellEffect {
 
     override fun use(context: SpellContext): SpellContext? = null
 
@@ -17,7 +18,7 @@ class StubSpell(override val color: Vec3f, override val shape: SpellShape): Spel
     override val cost get() = 0
 
     companion object{
-        val INSTANCE=StubSpell(ColorTools.vec(DyeColor.WHITE.fireworkColor), SpellShape())
+        val INSTANCE= StubSpellEffect(ColorTools.vec(DyeColor.WHITE.fireworkColor), SpellShape())
     }
 
 }

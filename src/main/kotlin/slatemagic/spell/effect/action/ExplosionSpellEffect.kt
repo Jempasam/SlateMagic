@@ -1,4 +1,4 @@
-package slatemagic.spell.action
+package slatemagic.spell.effect.action
 
 import net.minecraft.text.Text
 import net.minecraft.util.DyeColor
@@ -10,12 +10,15 @@ import slatemagic.network.messages.AdvancedParticleMessage
 import slatemagic.network.messages.sendParticleEffect
 import slatemagic.particle.MagicParticleEffect
 import slatemagic.shape.SpellShape
-import slatemagic.spell.Spell
 import slatemagic.spell.SpellContext
+import slatemagic.spell.build.SPELL
+import slatemagic.spell.build.SpellNode
+import slatemagic.spell.build.SpellPart
+import slatemagic.spell.effect.SpellEffect
 
-class ExplosionSpell: Spell {
+class ExplosionSpellEffect(val power: Float=1f): SpellEffect {
     override fun use(context: SpellContext): SpellContext {
-        context.world.createExplosion(null, context.pos.x, context.pos.y, context.pos.z, 0.5f+context.power.toFloat()/2, false, Explosion.DestructionType.DESTROY)
+        context.world.createExplosion(null, context.pos.x, context.pos.y, context.pos.z, 1.0f+power*context.power.toFloat()/2, false, Explosion.DestructionType.DESTROY)
         val ppower=context.power/10.0
         sendParticleEffect(
             context.world,
@@ -23,7 +26,7 @@ class ExplosionSpell: Spell {
             context.pos,
             AdvancedParticleMessage.BOOM,
             Vec3d(ppower, ppower, ppower),
-            context.power*10.0
+            context.power*10.0*power
         )
         return context
     }
@@ -38,4 +41,11 @@ class ExplosionSpell: Spell {
 
     override val shape: SpellShape get() = SpellShape(Array(4){SpellShape.Circle(16, 20, 0, 0, 1, 40, 8)})
 
+    object Node: SpellNode<SpellEffect> {
+        override val parameters = listOf<SpellPart.Type<*>>()
+        override val name = "Explosion"
+        override fun build(parts: List<SpellPart<*>>): SpellPart<SpellEffect> {
+            return SPELL.create(ExplosionSpellEffect())
+        }
+    }
 }

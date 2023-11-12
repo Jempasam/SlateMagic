@@ -20,17 +20,16 @@ class ProjectileCrossedRenderer(ctx: EntityRendererFactory.Context, val factory:
     override fun render(entity: SpellProjectileEntity, yaw: Float, tickDelta: Float, matrix: MatrixStack, vertexConsumers: VertexConsumerProvider, i: Int) {
         val spell=entity.spell
 
-        val x = MathHelper.lerp(tickDelta.toDouble(), entity.lastRenderX, entity.x)
-        val y = MathHelper.lerp(tickDelta.toDouble(), entity.lastRenderY, entity.y)
-        val z = MathHelper.lerp(tickDelta.toDouble(), entity.lastRenderZ, entity.z)
+        val pitch= MathHelper.lerp(tickDelta,entity.prevPitch, entity.pitch)
+        val yaw= MathHelper.lerp(tickDelta,entity.prevYaw, entity.yaw)
 
         matrix.push()
         matrix.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0f - yaw))
-        matrix.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(entity.pitch))
+        matrix.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(pitch))
         matrix.scale(factory.size, factory.size, factory.size)
         val vertexs = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(this.getTexture(entity)))
         val panter=CrossedVertexPainter(EntityVPC(vertexs,matrix.peek().positionMatrix), ColorTools.int(spell.color),0.1f)
-        spell.shape.draw(panter)
+        spell.shape.draw(panter, (entity.age.toDouble()+tickDelta)/10.0)
 
         matrix.pop()
 

@@ -14,4 +14,5 @@ object SlateMagicArgumentTypes {
     }
 
     val REGISTRY=register("registry", RegistryArgumentType::class.java, RegistryArgumentType.Serializer)
+    val LIST=register("list", ListArgumentType::class.java, ListArgumentType.Serializer)
 }

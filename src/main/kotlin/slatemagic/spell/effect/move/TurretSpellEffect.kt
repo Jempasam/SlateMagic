@@ -1,4 +1,4 @@
-package slatemagic.spell.move
+package slatemagic.spell.effect.move
 
 import net.minecraft.text.Text
 import net.minecraft.util.math.Vec3d
@@ -9,11 +9,11 @@ import slatemagic.network.messages.AdvancedParticleMessage
 import slatemagic.network.messages.sendParticleEffect
 import slatemagic.particle.MagicParticleEffect
 import slatemagic.shape.SpellShape
-import slatemagic.spell.Spell
+import slatemagic.spell.effect.SpellEffect
 import slatemagic.spell.SpellContext
 import kotlin.math.sqrt
 
-class TurretSpell(val cadency: Int, val count: Int, val decorated: Spell): Spell {
+class TurretSpellEffect(val cadency: Int, val count: Int, val decorated: SpellEffect): SpellEffect {
 
     override fun use(context: SpellContext): SpellContext? {
         val levelCount= (count*sqrt(context.power.toDouble())).toInt()
@@ -27,7 +27,7 @@ class TurretSpell(val cadency: Int, val count: Int, val decorated: Spell): Spell
             context.pos,
             AdvancedParticleMessage.SHOCKWAVE,
             Vec3d(1.0,0.0,1.0),
-            15.0
+            20.0
         )
         return SpellContext.at(trap,context.power)
     }

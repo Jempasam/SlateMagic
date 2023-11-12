@@ -1,4 +1,4 @@
-package slatemagic.spell.action
+package slatemagic.spell.effect.action
 
 import net.minecraft.entity.EntityType
 import net.minecraft.text.Text
@@ -8,10 +8,10 @@ import slatemagic.network.messages.sendParticleEffect
 import slatemagic.particle.SlateMagicParticles
 import slatemagic.particle.SpellCircleParticleEffect
 import slatemagic.shape.SpellShape
-import slatemagic.spell.Spell
+import slatemagic.spell.effect.SpellEffect
 import slatemagic.spell.SpellContext
 
-class EntitySpell(val type: EntityType<*>): Spell {
+class EntitySpellEffect(val type: EntityType<*>): SpellEffect {
     override fun use(context: SpellContext): SpellContext? {
         val spawned= type.create(context.world) ?: return null
         context.world.spawnEntity(spawned)

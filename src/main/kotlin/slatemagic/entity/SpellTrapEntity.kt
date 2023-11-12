@@ -13,8 +13,8 @@ import slatemagic.network.messages.AdvancedParticleMessage
 import slatemagic.network.messages.sendParticleEffect
 import slatemagic.particle.AdvancedParticle
 import slatemagic.particle.MagicParticleEffect
-import slatemagic.spell.Spell
 import slatemagic.spell.SpellContext
+import slatemagic.spell.effect.SpellEffect
 import kotlin.math.min
 import kotlin.random.Random
 
@@ -25,7 +25,7 @@ class SpellTrapEntity : SimpleSpellEntity{
         val RANGE= DataTracker.registerData(SpellTrapEntity::class.java, TrackedDataHandlerRegistry.FLOAT)
     }
 
-    private var remaining_shoot=1
+    private var remainingshoot=1
     private var time=0
 
     var range: Float
@@ -34,11 +34,11 @@ class SpellTrapEntity : SimpleSpellEntity{
 
     constructor(type: EntityType<*>, world: World) : super(type, world)
 
-    constructor(type: EntityType<*>, world: World, spell: Spell, power: Int, range: Float, remaining_shoot: Int)
+    constructor(type: EntityType<*>, world: World, spell: SpellEffect, power: Int, range: Float, remainingShoot: Int)
             : super(type, world, spell, power)
     {
         this.range = range
-        this.remaining_shoot = remaining_shoot
+        this.remainingshoot = remainingShoot
     }
 
     override fun initDataTracker() {
@@ -63,7 +63,7 @@ class SpellTrapEntity : SimpleSpellEntity{
                     val context= SpellContext.at(this, power)
                     val result=spell.use(context)
                     if(result!=null){
-                        remaining_shoot--
+                        remainingshoot--
                         sendParticleEffect(world,
                             MagicParticleEffect(spell.color, 0.5f),
                             pos,
@@ -71,7 +71,7 @@ class SpellTrapEntity : SimpleSpellEntity{
                             target.pos,
                             5.0
                         )
-                        if(remaining_shoot<=0)kill()
+                        if(remainingshoot<=0)kill()
                     }
                 }
             }
@@ -98,13 +98,13 @@ class SpellTrapEntity : SimpleSpellEntity{
         super.readCustomDataFromNbt(nbt)
         range=nbt.getFloat("range")
         time=nbt.getInt("time")
-        remaining_shoot=nbt.getInt("remaining_shoot")
+        remainingshoot=nbt.getInt("remaining_shoot")
     }
 
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
         super.writeCustomDataToNbt(nbt)
         nbt.putFloat("range", range)
         nbt.putInt("time", time)
-        nbt.putInt("remaining_shoot", remaining_shoot)
+        nbt.putInt("remaining_shoot", remainingshoot)
     }
 }

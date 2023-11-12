@@ -30,7 +30,7 @@ class SpellCrossedRenderer(ctx: EntityRendererFactory.Context, val factory: Fact
         matrix.scale(factory.size, factory.size, factory.size)
         val vertexs = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(this.getTexture(entity)))
         val panter=CrossedVertexPainter(EntityVPC(vertexs,matrix.peek().positionMatrix), ColorTools.int(spell.color),0.1f)
-        spell.shape.draw(panter)
+        spell.shape.draw(panter, (entity.age.toDouble()+tickDelta)/10.0)
 
         matrix.pop()
 

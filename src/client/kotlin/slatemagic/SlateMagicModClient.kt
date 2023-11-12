@@ -6,12 +6,12 @@ import slatemagic.command.SlateMagicClientCommands
 import slatemagic.entity.SlateMagicRenderers
 import slatemagic.network.SlateMagicClientNetwork
 import slatemagic.particle.SlateMagicClientParticles
-import slatemagic.spell.Spell
+import slatemagic.spell.effect.SpellEffect
 import slatemagic.ui.ShowSpellGUI
 
 object SlateMagicModClient : ClientModInitializer {
 
-	var spell: Spell?=null
+	var spell: SpellEffect?=null
 	var lastTime: Long=0
 
 	override fun onInitializeClient() {

@@ -7,13 +7,14 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.hit.EntityHitResult
+import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec2f
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 import slatemagic.entity.data.SpellEntity
 import slatemagic.entity.tracked.SlateMagicTrackedData
 import slatemagic.particle.MagicParticleEffect
-import slatemagic.spell.Spell
+import slatemagic.spell.effect.SpellEffect
 import slatemagic.spell.SpellContext
 
 class SpellProjectileEntity : ThrownEntity, SpellEntity {
@@ -30,7 +31,7 @@ class SpellProjectileEntity : ThrownEntity, SpellEntity {
     constructor(type: EntityType<out SpellProjectileEntity>, world: World)
             : super(type, world)
 
-    constructor(type: EntityType<out SpellProjectileEntity>, world: World, spell: Spell, power: Int, maxage: Int)
+    constructor(type: EntityType<out SpellProjectileEntity>, world: World, spell: SpellEffect, power: Int, maxage: Int)
             : super(type, world)
     {
         this.maxage = maxage
@@ -38,10 +39,18 @@ class SpellProjectileEntity : ThrownEntity, SpellEntity {
         this.spellData.power=power
     }
 
+    fun setVelocity(pitch: Float, yaw: Float, speed: Float, divergence: Float) {
+        val f = -MathHelper.sin(yaw * 0.017453292f) * MathHelper.cos(pitch * 0.017453292f)
+        val g = -MathHelper.sin(pitch * 0.017453292f)
+        val h = MathHelper.cos(yaw * 0.017453292f) * MathHelper.cos(pitch * 0.017453292f)
+        this.setVelocity(f.toDouble(), g.toDouble(), h.toDouble(), speed, divergence)
+    }
+
+
     override fun tick() {
         super.tick()
         if(world.isClient){
-            if(age%5==0) world.addParticle(MagicParticleEffect(spell.color, 0.3f), x, y, z, 0.0, 0.0, 0.0)
+            world.addParticle(MagicParticleEffect(spell.color, 0.3f), x, y, z, 0.0, 0.0, 0.0)
         }
         else{
             if(age>maxage) kill()

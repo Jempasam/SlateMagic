@@ -1,13 +1,14 @@
-package slatemagic.spell
+package slatemagic.spell.effect
 
 import net.minecraft.text.Text
 import net.minecraft.util.math.Vec3f
 import slatemagic.shape.SpellShape
+import slatemagic.spell.SpellContext
 
 /**
  * A spell effect is a single effect that can be applied to a spell.
  */
-interface Spell {
+interface SpellEffect {
 
     /**
      * Use the spell effect at the given context.

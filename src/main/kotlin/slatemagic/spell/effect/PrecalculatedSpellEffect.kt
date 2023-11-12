@@ -1,8 +1,9 @@
-package slatemagic.spell
+package slatemagic.spell.effect
 
 import net.minecraft.util.math.Vec3f
+import slatemagic.spell.SpellContext
 
-class PrecalculatedSpell(val spell: Spell): Spell{
+class PrecalculatedSpellEffect(val spell: SpellEffect): SpellEffect {
 
     override fun use(context: SpellContext): SpellContext? = spell.use(context)
 

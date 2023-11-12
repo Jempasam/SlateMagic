@@ -1,4 +1,4 @@
-package slatemagic.spell.move
+package slatemagic.spell.effect.move
 
 import net.minecraft.text.Text
 import net.minecraft.util.math.Box
@@ -8,30 +8,31 @@ import slatemagic.network.messages.AdvancedParticleMessage
 import slatemagic.network.messages.sendParticleEffect
 import slatemagic.particle.MagicParticleEffect
 import slatemagic.shape.SpellShape
-import slatemagic.spell.Spell
 import slatemagic.spell.SpellContext
+import slatemagic.spell.effect.SpellEffect
 import kotlin.math.cbrt
+import kotlin.math.max
 
-class ZoneSpell(val zone: Vec3d, val decorated: Spell): Spell {
+class ZoneSpellEffect(val zone: Vec3d, val decorated: SpellEffect): SpellEffect {
 
     override fun use(context: SpellContext): SpellContext? {
         val ppower= cbrt(context.power.toDouble())
-        val leveled_zone=zone.multiply(ppower)
-        val targets=context.world.getOtherEntities(null, Box.of(context.pos,leveled_zone.x,leveled_zone.y,leveled_zone.z))
-        var last_context: SpellContext?=null
+        val leveledZone=zone.multiply(ppower)
+        val targets=context.world.getOtherEntities(null, Box.of(context.pos,leveledZone.x,leveledZone.y,leveledZone.z))
+        var lastContext: SpellContext?=null
         for(target in targets){
-            val sub_context= SpellContext.at(target, context.power)
-            last_context=decorated.use(sub_context) ?: last_context
+            val subContext= SpellContext.at(target, context.power)
+            lastContext=decorated.use(subContext) ?: lastContext
         }
         sendParticleEffect(
             context.world,
-            MagicParticleEffect(color, 0.2f),
+            MagicParticleEffect(color, 0.3f),
             context.pos,
             AdvancedParticleMessage.CLOUD,
-            leveled_zone.multiply(0.5),
-            leveled_zone.x*leveled_zone.y*leveled_zone.z/6f
+            leveledZone.multiply(0.5),
+            max(4.0,leveledZone.x*leveledZone.y*leveledZone.z/4.0)
         )
-        return last_context
+        return lastContext
     }
 
     override val name: Text get() = Text.of("Zone ").also { it.siblings.add(decorated.name) }
