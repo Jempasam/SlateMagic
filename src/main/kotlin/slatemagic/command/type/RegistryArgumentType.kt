@@ -9,7 +9,6 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType
 import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import net.minecraft.command.CommandRegistryAccess
-import net.minecraft.command.CommandSource
 import net.minecraft.command.argument.serialize.ArgumentSerializer
 import net.minecraft.command.argument.serialize.ArgumentSerializer.ArgumentTypeProperties
 import net.minecraft.network.PacketByteBuf
@@ -20,12 +19,24 @@ import net.minecraft.util.registry.Registry
 import slatemagic.registry.SlateMagicRegistry
 import java.util.concurrent.CompletableFuture
 
-class RegistryArgumentType<T>(val registry: Registry<T>): ArgumentType<T> {
+class RegistryArgumentType<T>(val registry: Registry<T>, val baseNamespace: String="minecraft"): ArgumentType<T> {
 
     @Throws(CommandSyntaxException::class)
-    override fun parse(stringReader: StringReader): T {
-        val identifier=Identifier.fromCommandInput(stringReader)
-        val obj= registry.get(identifier) ?: throw DOES_NOT_EXIST.create(identifier)
+    override fun parse(reader: StringReader): T {
+        // Identifier str
+        val i: Int = reader.getCursor()
+        while (reader.canRead() && Identifier.isCharValid(reader.peek())) {
+            reader.skip()
+        }
+        var string: String = reader.getString().substring(i, reader.getCursor())
+        if(!string.contains(':'))string="$baseNamespace:$string"
+
+        // Identifier
+        val identifier=Identifier(string)
+
+        // Get
+        val obj= registry.get(identifier)
+            ?: throw DOES_NOT_EXIST.create(identifier)
         return obj
     }
 
@@ -34,7 +45,13 @@ class RegistryArgumentType<T>(val registry: Registry<T>): ArgumentType<T> {
     }
 
     override fun <S> listSuggestions( context: CommandContext<S>, builder: SuggestionsBuilder ): CompletableFuture<Suggestions> {
-        return CommandSource.suggestIdentifiers(registry.ids, builder);
+        val string = builder.remaining.lowercase()
+        registry.ids.forEach { id ->
+            if(id.toString().startsWith(builder.remaining) || (id.namespace==baseNamespace && id.path.startsWith(builder.remaining))){
+                builder.suggest(id.toString())
+            }
+        }
+        return builder.buildFuture()
     }
 
     companion object {
@@ -46,13 +63,13 @@ class RegistryArgumentType<T>(val registry: Registry<T>): ArgumentType<T> {
     }
 
 
-    class Properties(val registry: Registry<*>) : ArgumentTypeProperties<RegistryArgumentType<*>> {
+    class Properties(val registry: Registry<*>, val baseNamespace: String) : ArgumentTypeProperties<RegistryArgumentType<*>> {
         override fun createType(commandRegistryAccess: CommandRegistryAccess): RegistryArgumentType<*> {
             return create(registry)
         }
 
         private fun <T>create(registry: Registry<T>): RegistryArgumentType<T> {
-            return RegistryArgumentType(registry)
+            return RegistryArgumentType(registry,baseNamespace)
         }
 
         override fun getSerializer(): ArgumentSerializer<RegistryArgumentType<*>, Properties> {
@@ -64,19 +81,21 @@ class RegistryArgumentType<T>(val registry: Registry<T>): ArgumentType<T> {
     object Serializer : ArgumentSerializer<RegistryArgumentType<*>, Properties> {
         override fun writePacket(properties: Properties, packetByteBuf: PacketByteBuf) {
             packetByteBuf.writeString(properties.registry.key.value.toString())
+            packetByteBuf.writeString(properties.baseNamespace)
         }
 
         override fun fromPacket(packetByteBuf: PacketByteBuf): Properties {
             val id=Identifier(packetByteBuf.readString(32767))
-            return Properties(getRegistry(id))
+            return Properties(getRegistry(id),packetByteBuf.readString())
         }
 
         override fun writeJson(properties: Properties, jsonObject: JsonObject) {
             jsonObject.addProperty("registry", properties.registry.key.value.toString())
+            jsonObject.addProperty("baseNamespace", properties.baseNamespace)
         }
 
         override fun getArgumentTypeProperties(entityArgumentType: RegistryArgumentType<*>): Properties {
-            return Properties(entityArgumentType.registry)
+            return Properties(entityArgumentType.registry,entityArgumentType.baseNamespace)
         }
 
         fun getRegistry(id: Identifier): Registry<*>{

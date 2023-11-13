@@ -71,6 +71,13 @@ class SpellTrapEntity : SimpleSpellEntity{
                             target.pos,
                             5.0
                         )
+                        sendParticleEffect(context.world,
+                            MagicParticleEffect(spell.color, 0.5f),
+                            context.pos,
+                            AdvancedParticleMessage.SHOCKWAVE,
+                            Vec3d(range,range,range),
+                            15.0*range
+                        )
                         if(remainingshoot<=0)kill()
                     }
                 }

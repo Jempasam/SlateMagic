@@ -13,10 +13,6 @@ import slatemagic.network.messages.sendParticleEffect
 import slatemagic.particle.MagicParticleEffect
 import slatemagic.shape.SpellShape
 import slatemagic.spell.SpellContext
-import slatemagic.spell.build.NUMBER
-import slatemagic.spell.build.SPELL
-import slatemagic.spell.build.SpellNode
-import slatemagic.spell.build.SpellPart
 import slatemagic.spell.effect.SpellEffect
 import kotlin.math.min
 
@@ -56,36 +52,4 @@ class DamageSpellEffect(val damage: Int): SpellEffect {
             it[3]= SpellShape.Circle(16, 0, 0, 0, 2, 0, 0)
         }
     )
-
-    object Node2: SpellNode<SpellEffect>{
-        override val parameters = listOf<SpellPart.Type<*>>()
-        override val name = "Damage 2"
-        override fun build(parts: List<SpellPart<*>>): SpellPart<SpellEffect> {
-            return SPELL.create(DamageSpellEffect(2))
-        }
-    }
-
-    object Node4: SpellNode<SpellEffect>{
-        override val parameters = listOf<SpellPart.Type<*>>()
-        override val name = "Damage 4"
-        override fun build(parts: List<SpellPart<*>>): SpellPart<SpellEffect> {
-            return SPELL.create(DamageSpellEffect(4))
-        }
-    }
-
-    object Node8: SpellNode<SpellEffect>{
-        override val parameters = listOf<SpellPart.Type<*>>()
-        override val name = "Damage 8"
-        override fun build(parts: List<SpellPart<*>>): SpellPart<SpellEffect> {
-            return SPELL.create(DamageSpellEffect(8))
-        }
-    }
-
-    object NodeX: SpellNode<SpellEffect>{
-        override val parameters = listOf(NUMBER)
-        override val name = "Damage X"
-        override fun build(parts: List<SpellPart<*>>): SpellPart<SpellEffect> {
-            return SPELL.create(DamageSpellEffect(NUMBER.cast(parts[0])?.toInt() ?: 1))
-        }
-    }
 }

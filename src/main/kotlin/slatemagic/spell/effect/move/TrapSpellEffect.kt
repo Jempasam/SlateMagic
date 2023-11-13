@@ -9,8 +9,8 @@ import slatemagic.network.messages.AdvancedParticleMessage
 import slatemagic.network.messages.sendParticleEffect
 import slatemagic.particle.MagicParticleEffect
 import slatemagic.shape.SpellShape
-import slatemagic.spell.effect.SpellEffect
 import slatemagic.spell.SpellContext
+import slatemagic.spell.effect.SpellEffect
 import kotlin.math.cbrt
 import kotlin.math.sqrt
 
@@ -18,7 +18,7 @@ class TrapSpellEffect(val range: Float, val count: Int, val decorated: SpellEffe
 
     override fun use(context: SpellContext): SpellContext? {
         val levelRange=range* cbrt(context.power.toFloat())
-        val levelCount= sqrt(context.power.toDouble()).toInt()
+        val levelCount= count* sqrt(context.power.toDouble()).toInt()
         val trap=SpellTrapEntity(SlateMagicEntities.SPELL_TRAP, context.world, decorated, context.power, levelRange, levelCount)
         trap.setPosition(context.pos)
         context.world.spawnEntity(trap)

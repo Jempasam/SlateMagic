@@ -10,9 +10,6 @@ import slatemagic.network.messages.sendParticleEffect
 import slatemagic.particle.MagicParticleEffect
 import slatemagic.shape.SpellShape
 import slatemagic.spell.SpellContext
-import slatemagic.spell.build.SPELL
-import slatemagic.spell.build.SpellNode
-import slatemagic.spell.build.SpellPart
 import slatemagic.spell.effect.SpellEffect
 import kotlin.math.max
 import kotlin.math.sqrt
@@ -58,14 +55,6 @@ class ProjectileSpellEffect(val strength: Float, val duration: Int, val decorate
         it[2].apply {
             this.cornerCount= 6
             this.succionDepth= (this.succionDepth + 80*max(1f,strength/1f+duration/400f)).toInt().toByte()
-        }
-    }
-
-    object Node: SpellNode<SpellEffect> {
-        override val parameters = listOf(SPELL)
-        override val name = "Projectile"
-        override fun build(parts: List<SpellPart<*>>): SpellPart<SpellEffect> {
-            return SPELL.create(ProjectileSpellEffect(0.5f,100,SPELL.cast(parts[0])?:throw Exception()))
         }
     }
 

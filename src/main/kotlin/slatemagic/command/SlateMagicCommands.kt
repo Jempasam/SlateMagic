@@ -13,6 +13,7 @@ import net.minecraft.text.LiteralTextContent
 import net.minecraft.text.MutableText
 import net.minecraft.text.Style
 import net.minecraft.text.Text
+import slatemagic.SlateMagicMod
 import slatemagic.command.commands.ParticleEffectCommand
 import slatemagic.command.type.ListArgumentType
 import slatemagic.command.type.RegistryArgumentType
@@ -112,12 +113,12 @@ object SlateMagicCommands {
 
     val SPELL= literal("spell").then(
         literal("spell")
-            .then(argument("spell",RegistryArgumentType(SlateMagicRegistry.EFFECTS))
+            .then(argument("spell",RegistryArgumentType(SlateMagicRegistry.EFFECTS,SlateMagicMod.MODID))
                 .spellNodes()
             )
     ).then(
         literal("node")
-            .then(argument("spell",ListArgumentType(RegistryArgumentType(SlateMagicRegistry.SPELL_NODES)))
+            .then(argument("spell",ListArgumentType(RegistryArgumentType(SlateMagicRegistry.SPELL_NODES,SlateMagicMod.MODID)))
                 .spellNodes()
             )
 

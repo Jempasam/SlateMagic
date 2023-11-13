@@ -11,9 +11,6 @@ import slatemagic.network.messages.sendParticleEffect
 import slatemagic.particle.MagicParticleEffect
 import slatemagic.shape.SpellShape
 import slatemagic.spell.SpellContext
-import slatemagic.spell.build.SPELL
-import slatemagic.spell.build.SpellNode
-import slatemagic.spell.build.SpellPart
 import slatemagic.spell.effect.SpellEffect
 
 class ExplosionSpellEffect(val power: Float=1f): SpellEffect {
@@ -41,11 +38,4 @@ class ExplosionSpellEffect(val power: Float=1f): SpellEffect {
 
     override val shape: SpellShape get() = SpellShape(Array(4){SpellShape.Circle(16, 20, 0, 0, 1, 40, 8)})
 
-    object Node: SpellNode<SpellEffect> {
-        override val parameters = listOf<SpellPart.Type<*>>()
-        override val name = "Explosion"
-        override fun build(parts: List<SpellPart<*>>): SpellPart<SpellEffect> {
-            return SPELL.create(ExplosionSpellEffect())
-        }
-    }
 }

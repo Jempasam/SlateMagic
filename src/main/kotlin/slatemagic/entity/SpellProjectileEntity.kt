@@ -14,8 +14,8 @@ import net.minecraft.world.World
 import slatemagic.entity.data.SpellEntity
 import slatemagic.entity.tracked.SlateMagicTrackedData
 import slatemagic.particle.MagicParticleEffect
-import slatemagic.spell.effect.SpellEffect
 import slatemagic.spell.SpellContext
+import slatemagic.spell.effect.SpellEffect
 
 class SpellProjectileEntity : ThrownEntity, SpellEntity {
 
@@ -53,7 +53,9 @@ class SpellProjectileEntity : ThrownEntity, SpellEntity {
             world.addParticle(MagicParticleEffect(spell.color, 0.3f), x, y, z, 0.0, 0.0, 0.0)
         }
         else{
-            if(age>maxage) kill()
+            if(age>maxage){
+                onPos(pos)
+            }
         }
     }
 
@@ -68,8 +70,14 @@ class SpellProjectileEntity : ThrownEntity, SpellEntity {
     override fun onBlockHit(blockHitResult: BlockHitResult) {
         super.onBlockHit(blockHitResult)
         val rotation=Vec2f(-pitch,yaw)
+        val pos=blockHitResult.blockPos.add(blockHitResult.side.vector)
+        onPos(Vec3d.ofCenter(pos))
+    }
+
+    fun onPos(pos: Vec3d){
+        val rotation=Vec2f(-pitch,yaw)
         if(!world.isClient) {
-            spell.use(SpellContext.at(world as ServerWorld, Vec3d.ofCenter(blockHitResult.blockPos), rotation, power))
+            spell.use(SpellContext.at(world as ServerWorld, pos, rotation, power))
             kill()
         }
     }
