@@ -9,8 +9,8 @@ import slatemagic.network.messages.AdvancedParticleMessage
 import slatemagic.network.messages.sendParticleEffect
 import slatemagic.particle.MagicParticleEffect
 import slatemagic.shape.SpellShape
-import slatemagic.spell.effect.SpellEffect
 import slatemagic.spell.SpellContext
+import slatemagic.spell.effect.SpellEffect
 import kotlin.math.sqrt
 
 class TurretSpellEffect(val cadency: Int, val count: Int, val decorated: SpellEffect): SpellEffect {
@@ -39,7 +39,7 @@ class TurretSpellEffect(val cadency: Int, val count: Int, val decorated: SpellEf
 
     override val description: Text get(){
         if(count==1)return Text.of("after some time ").also { it.siblings.add(decorated.description) }
-        else return Text.of("a turret that, $count times, ").also { it.siblings.add(decorated.description) }
+        else return Text.of("summon a turret that, $count times, ").also { it.siblings.add(decorated.description) }
     }
 
     override val cost: Int get() = decorated.cost*count

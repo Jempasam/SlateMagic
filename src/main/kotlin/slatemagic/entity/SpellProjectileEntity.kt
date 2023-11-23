@@ -69,13 +69,13 @@ class SpellProjectileEntity : ThrownEntity, SpellEntity {
 
     override fun onBlockHit(blockHitResult: BlockHitResult) {
         super.onBlockHit(blockHitResult)
-        val rotation=Vec2f(-pitch,yaw)
+        val rotation=Vec2f(pitch,-yaw)
         val pos=blockHitResult.blockPos.add(blockHitResult.side.vector)
         onPos(Vec3d.ofCenter(pos))
     }
 
     fun onPos(pos: Vec3d){
-        val rotation=Vec2f(-pitch,yaw)
+        val rotation=Vec2f(pitch,-yaw)
         if(!world.isClient) {
             spell.use(SpellContext.at(world as ServerWorld, pos, rotation, power))
             kill()

@@ -55,7 +55,7 @@ class SpellTrapEntity : SimpleSpellEntity{
             if(time>10){
                 time=0
                 val range=range.toDouble()
-                val collisions=world.getOtherEntities(this, Box.of(pos,range,range,range))
+                val collisions=world.getOtherEntities(this, Box.of(pos,range,range,range)){ it.isLiving }
                 if(collisions.size>0){
                     val i = Random.nextInt(collisions.size)
                     val target=collisions[i]

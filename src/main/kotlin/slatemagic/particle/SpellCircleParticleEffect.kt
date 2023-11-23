@@ -10,6 +10,7 @@ import net.minecraft.util.Identifier
 import slatemagic.helper.ColorTools
 import slatemagic.registry.SlateMagicRegistry
 import slatemagic.shape.SpellShape
+import slatemagic.spell.effect.SpellEffect
 
 open class SpellCircleParticleEffect(private val type: ParticleType<*>, val shape: SpellShape, val color: Int, val size: Float, val duration: Int=100): ParticleEffect {
 
@@ -50,5 +51,16 @@ open class SpellCircleParticleEffect(private val type: ParticleType<*>, val shap
         override fun read(type: ParticleType<SpellCircleParticleEffect>, buf: PacketByteBuf ): SpellCircleParticleEffect {
             return SpellCircleParticleEffect(type, SpellShape(buf.readString()),buf.readInt(), buf.readFloat(), buf.readInt())
         }
+    }
+
+    companion object{
+        fun circle(spell: SpellEffect, size: Float=1.0f, duration: Int=200)
+                = SpellCircleParticleEffect(SlateMagicParticles.SPELL_CIRCLE, spell.shape, ColorTools.int(spell.color), size, duration)
+
+        fun crossed(spell: SpellEffect, size: Float=1.0f, duration: Int=200)
+                = SpellCircleParticleEffect(SlateMagicParticles.SPELL_CROSSED, spell.shape, ColorTools.int(spell.color), size, duration)
+
+        fun sphere(spell: SpellEffect, size: Float=1.0f, duration: Int=200)
+                = SpellCircleParticleEffect(SlateMagicParticles.SPELL_SPHERE, spell.shape, ColorTools.int(spell.color), size, duration)
     }
 }

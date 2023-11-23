@@ -34,7 +34,7 @@ class TrapSpellEffect(val range: Float, val count: Int, val decorated: SpellEffe
 
     override val name: Text get() = Text.of("Trap of ").also { it.siblings.add(decorated.name) }
 
-    override val description: Text get() = Text.of("a trap with a range of $range that ").also { it.siblings.add(decorated.description) }
+    override val description: Text get() = Text.of("summon a trap with a range of $range that ").also { it.siblings.add(decorated.description) }
 
     override val cost: Int get() = (decorated.cost*(1.0+range/2.0)*count).toInt()
 

@@ -1,0 +1,6 @@
+{
+  "parent": "slate-magic:block/cube_tint",
+  "textures": {
+    "all": "slate-magic:block/slate_block"
+  }
+}
