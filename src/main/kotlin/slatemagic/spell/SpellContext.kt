@@ -32,6 +32,12 @@ data class SpellContext private constructor(
         return ret
     }
 
+    fun setEntity(entity: Entity): SpellContext{
+        _entity=entity
+        _pos=entity.pos
+        return this
+    }
+
     companion object{
 
         fun at(world: ServerWorld, pos: Vec3d, rot : Vec2f=Vec2f.ZERO, power: Int=1)

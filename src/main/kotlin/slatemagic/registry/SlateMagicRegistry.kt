@@ -6,29 +6,22 @@ import net.minecraft.util.registry.Registry
 import net.minecraft.util.registry.RegistryKey
 import net.minecraft.util.registry.SimpleRegistry
 import slatemagic.SlateMagicMod
-import slatemagic.spell.build.SlateMagicSpellNodes
-import slatemagic.spell.build.SpellNode
-import slatemagic.spell.build.SpellNodeDecoder
-import slatemagic.spell.build.assembleSpell
-import slatemagic.spell.effect.SpellEffect
+import slatemagic.spell.build.*
 
 object SlateMagicRegistry {
 
     val DYNAMICS= registry<Registry<*>>(key("registries"))
 
-    var EFFECTS = dynamicRegistry<SpellEffect>(key("effects"))
+    var EFFECTS = dynamicRegistry<AssembledSpell>(key("effects"))
 
     var NODES = dynamicRegistry<SpellNode<*>>(key("nodes"))
 
     val NODE_DECODERS = registry<SpellNodeDecoder<*>>(key("node_decoders"))
 
-    fun clearEffects() = dynamicRegistry<SpellEffect>(key("effects"))
-
-    fun clearNodes() = dynamicRegistry<SpellNode<*>>(key("effects"))
 
     init{
         fun spell(id: String, vararg parts: SpellNode<*>){
-            Registry.register(EFFECTS, SlateMagicMod.id(id), listOf(*parts).assembleSpell().effect)
+            Registry.register(EFFECTS, SlateMagicMod.id(id), listOf(*parts).assembleSpell())
         }
 
         SlateMagicSpellNodes.apply {

@@ -5,7 +5,13 @@
   "block.slate-magic.smart_activator_block": "Totem Smart Activator Block",
 
   "item.slate-magic.activator": "Totem Activator %s",
+  "item.slate-magic.spell_dust": "Dust of %s",
+  "item.slate-magic.spell_orb": "Orb Of %s",
+
+  "itemGroup.slate-magic.main": "Slate Magic",
+  "itemGroup.slate-magic.tools": "Tools",
   "itemGroup.slate-magic.slates": "Slates",
+  "itemGroup.slate-magic.spells": "Spells",
 
   "spellnode.slate-magic.bomb": "Bomb",
   "spellnode.slate-magic.bomb.desc": "Summon a bomb that cast a spell after a delay",

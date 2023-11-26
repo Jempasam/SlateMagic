@@ -7,6 +7,10 @@ import kotlin.math.sin
 
 class SpellShape(private val circles: Array<Circle>) {
 
+    companion object{
+        fun of(vararg circles: Circle) = SpellShape(arrayOf(*circles))
+    }
+
     init{
         require(circles.size==4)
     }

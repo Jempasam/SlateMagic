@@ -28,6 +28,7 @@ import slatemagic.particle.SpellCircleParticleEffect
 import slatemagic.registry.SlateMagicRegistry
 import slatemagic.shape.painter.GraphicsPainter
 import slatemagic.spell.SpellContext
+import slatemagic.spell.build.AssembledSpell
 import slatemagic.spell.build.SpellNode
 import slatemagic.spell.build.assemble
 import slatemagic.spell.effect.SpellEffect
@@ -40,9 +41,9 @@ import slatemagic.spell.build.SPELL as SPELL_PART
 object SlateMagicCommands {
 
     fun CommandContext<ServerCommandSource>.getSpell(name: String): SpellEffect {
-        val arg=getArgument("spell", Object::class.java)
+        val arg=getArgument("spell", Any::class.java)
         when (arg) {
-            is SpellEffect -> return arg
+            is AssembledSpell -> return arg.effect
 
             is List<*> -> {
                 val nodes=arg as List<SpellNode<*>>

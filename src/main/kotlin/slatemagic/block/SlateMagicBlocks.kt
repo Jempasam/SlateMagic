@@ -15,5 +15,5 @@ object SlateMagicBlocks {
 
     val SLATE_BLOCK= create("slate_block", SlateBlock(::SlateBlockEntity, AbstractBlock.Settings.copy(net.minecraft.block.Blocks.STONE)))
     val ACTIVATOR_BLOCK= create("activator_block", ActivatorBlock(AbstractBlock.Settings.copy(Blocks.STONE),false))
-    val SMART_ACTIVATOR_BLOCK= create("smart_activator_block", ActivatorBlock(AbstractBlock.Settings.copy(Blocks.STONE),false))
+    val SMART_ACTIVATOR_BLOCK= create("smart_activator_block", ActivatorBlock(AbstractBlock.Settings.copy(Blocks.STONE),true))
 }

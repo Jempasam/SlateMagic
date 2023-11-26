@@ -36,7 +36,7 @@ open class SpellCircleParticleEffect(private val type: ParticleType<*>, val shap
                 SpellShape(str) to reader.readInt()
             }catch (e: Exception){
                 val id=Identifier.tryParse(str) ?: throw UNKNOWN_SPELL.create(str)
-                val spell=SlateMagicRegistry.EFFECTS.get(id) ?: throw UNKNOWN_SPELL.create(str)
+                val spell=SlateMagicRegistry.EFFECTS.get(id)?.effect ?: throw UNKNOWN_SPELL.create(str)
                 spell.shape to ColorTools.int(spell.color)
             }
 

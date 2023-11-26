@@ -23,7 +23,6 @@ object SpellNodeLoader: JsonLoader<SpellNode<*>>(SlateMagicMod.id("spell_node_lo
     }
 
     override fun apply(data: List<Pair<Identifier,SpellNode<*>>>, manager: ResourceManager, profiler: Profiler) {
-        SlateMagicRegistry.clearNodes()
         for(node in data){
             Registry.register(SlateMagicRegistry.NODES, node.first, node.second)
         }
