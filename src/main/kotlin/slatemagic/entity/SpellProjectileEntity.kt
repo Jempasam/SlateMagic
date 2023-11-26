@@ -15,7 +15,7 @@ import slatemagic.entity.data.SpellEntity
 import slatemagic.entity.tracked.SlateMagicTrackedData
 import slatemagic.particle.MagicParticleEffect
 import slatemagic.spell.SpellContext
-import slatemagic.spell.effect.SpellEffect
+import slatemagic.spell.build.AssembledSpell
 
 class SpellProjectileEntity : ThrownEntity, SpellEntity {
 
@@ -31,7 +31,7 @@ class SpellProjectileEntity : ThrownEntity, SpellEntity {
     constructor(type: EntityType<out SpellProjectileEntity>, world: World)
             : super(type, world)
 
-    constructor(type: EntityType<out SpellProjectileEntity>, world: World, spell: SpellEffect, power: Int, maxage: Int)
+    constructor(type: EntityType<out SpellProjectileEntity>, world: World, spell: AssembledSpell, power: Int, maxage: Int)
             : super(type, world)
     {
         this.maxage = maxage
@@ -62,22 +62,27 @@ class SpellProjectileEntity : ThrownEntity, SpellEntity {
     override fun onEntityHit(entityHitResult: EntityHitResult) {
         super.onEntityHit(entityHitResult)
         if(!world.isClient){
-            spell.use(SpellContext.at(entityHitResult.entity, power))
+            val context=SpellContext.at(entityHitResult.entity, power)
+            context.markeds.addAll(markeds)
+            context.direction= Vec2f(-pitch, -yaw)
+            spell.use(context)
             kill()
         }
     }
 
     override fun onBlockHit(blockHitResult: BlockHitResult) {
         super.onBlockHit(blockHitResult)
-        val rotation=Vec2f(pitch,-yaw)
+        val rotation=Vec2f(-pitch,-yaw)
         val pos=blockHitResult.blockPos.add(blockHitResult.side.vector)
         onPos(Vec3d.ofCenter(pos))
     }
 
     fun onPos(pos: Vec3d){
-        val rotation=Vec2f(pitch,-yaw)
+        val rotation=Vec2f(-pitch,-yaw)
         if(!world.isClient) {
-            spell.use(SpellContext.at(world as ServerWorld, pos, rotation, power))
+            val ctx=SpellContext.at(world as ServerWorld, pos, rotation, power)
+            ctx.markeds.addAll(markeds)
+            spell.use(ctx)
             kill()
         }
     }
@@ -93,7 +98,6 @@ class SpellProjectileEntity : ThrownEntity, SpellEntity {
         age=nbt.getInt("age")
         maxage=nbt.getInt("maxage")
         spellData.read(nbt)
-
     }
 
     override fun writeCustomDataToNbt(nbt: NbtCompound) {

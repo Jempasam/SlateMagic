@@ -26,6 +26,12 @@
 				"value": "slatemagic.SlateMagicModClient",
 				"adapter": "kotlin"
 			}
+		],
+		"fabric-datagen": [
+			{
+				"value": "slatemagic.datagen.SlateMagicDataGenerator",
+				"adapter": "kotlin"
+			}
 		]
 	},
 	"mixins": [

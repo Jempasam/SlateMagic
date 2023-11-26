@@ -9,7 +9,7 @@ import slatemagic.network.messages.AdvancedParticleMessage
 import slatemagic.network.messages.sendParticleEffect
 import slatemagic.particle.MagicParticleEffect
 import slatemagic.spell.SpellContext
-import slatemagic.spell.effect.SpellEffect
+import slatemagic.spell.build.AssembledSpell
 
 class SpellTurretEntity : SimpleSpellEntity{
 
@@ -21,7 +21,7 @@ class SpellTurretEntity : SimpleSpellEntity{
 
     constructor(type: EntityType<*>, world: World) : super(type, world)
 
-    constructor(type: EntityType<*>, world: World, spell: SpellEffect, power: Int, cadency: Int, remainingShoot: Int)
+    constructor(type: EntityType<*>, world: World, spell: AssembledSpell, power: Int, cadency: Int, remainingShoot: Int)
             : super(type, world, spell, power)
     {
         this.cadency = cadency
@@ -51,7 +51,9 @@ class SpellTurretEntity : SimpleSpellEntity{
                     Vec3d(1.0,1.0,1.0),
                     10.0
                 )
-                spell.use(SpellContext.at(this, power))
+                val context=SpellContext.at(this, power)
+                context.markeds.addAll(markeds)
+                spell.use(context)
 
                 if(remainingShoot<=0) kill()
             }

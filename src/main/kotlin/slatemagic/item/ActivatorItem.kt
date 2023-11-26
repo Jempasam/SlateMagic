@@ -43,7 +43,7 @@ class ActivatorItem(settings: Settings) : Item(settings) {
             if(!context.world.isClient){
                 val (pos,direction,part)= fetchSpellPart(context.world,context.blockPos,context.side.opposite)
                 if(part.type == SPELL){
-                    val spell=SPELL.get(part)
+                    val spell=SPELL.get(part).effect
                     spell.use(SpellContext.at(
                         context.world as ServerWorld,
                         Vec3d.ofCenter(pos.offset(direction)),

@@ -29,6 +29,17 @@ loom {
 		}
 	}
 
+	runs {
+		datagen {
+			inherit client
+			name "Data Generation"
+			vmArg "-Dfabric-api.datagen"
+			vmArg "-Dfabric-api.datagen.output-dir=${file("src/client/generated")}"
+			vmArg "-Dfabric-api.datagen.modid=${archives_base_name}"
+			runDir "build/datagen"
+		}
+	}
+
 }
 
 dependencies {
@@ -94,5 +105,14 @@ publishing {
 		// Notice: This block does NOT have the same function as the block in the top level.
 		// The repositories here will be used for publishing your artifact, not for
 		// retrieving dependencies.
+	}
+}
+
+
+sourceSets {
+	client {
+		resources {
+			srcDirs += [ 'src/client/generated' ]
+		}
 	}
 }

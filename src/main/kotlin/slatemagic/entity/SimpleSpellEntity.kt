@@ -9,7 +9,7 @@ import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket
 import net.minecraft.world.World
 import slatemagic.entity.data.SpellEntity
 import slatemagic.entity.tracked.SlateMagicTrackedData
-import slatemagic.spell.effect.SpellEffect
+import slatemagic.spell.build.AssembledSpell
 
 
 open class SimpleSpellEntity(type: EntityType<*>, world: World) : Entity(type, world), SpellEntity {
@@ -20,7 +20,7 @@ open class SimpleSpellEntity(type: EntityType<*>, world: World) : Entity(type, w
     }
 
 
-    constructor(type: EntityType<*>, world: World, spell: SpellEffect, power: Int) : this(type, world) {
+    constructor(type: EntityType<*>, world: World, spell: AssembledSpell, power: Int) : this(type, world) {
         spellData.spell=spell
         spellData.power=power
     }

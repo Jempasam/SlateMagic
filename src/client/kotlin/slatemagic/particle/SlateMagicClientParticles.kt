@@ -11,6 +11,7 @@ object SlateMagicClientParticles {
             register(SlateMagicParticles.SPELL_CIRCLE) { it -> SpellCircleParticle.Factory(it) }
             register(SlateMagicParticles.SPELL_SPHERE) { it -> SpellSphereParticle.Factory(it) }
             register(SlateMagicParticles.SPELL_CROSSED) { it -> SpellCrossedParticle.Factory(it) }
+            register(SlateMagicParticles.SPELL_CIRCLE_MOVING) { it -> SpellCircleMovingParticle.Factory(it) }
         }
     }
 }

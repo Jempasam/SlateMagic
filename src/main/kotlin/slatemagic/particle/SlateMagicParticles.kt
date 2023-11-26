@@ -13,6 +13,8 @@ object SlateMagicParticles {
 
     val SPELL_SPHERE= register("spell_sphere", FabricParticleTypes.complex(false, SpellCircleParticleEffect.Factory))
 
+    val SPELL_CIRCLE_MOVING= register("spell_circle_moving", FabricParticleTypes.complex(false, SpellCircleParticleEffect.Factory))
+
     val SPELL_CROSSED= register("spell_crossed", FabricParticleTypes.complex(false, SpellCircleParticleEffect.Factory))
 
     private fun <T: ParticleType<*>>register(id: String, type: T): T{

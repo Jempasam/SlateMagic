@@ -4,28 +4,19 @@ import net.minecraft.text.Text
 import net.minecraft.util.math.MathHelper.lerp
 import net.minecraft.util.math.Vec2f
 import net.minecraft.util.math.Vec3f
-import slatemagic.helper.ColorTools
-import slatemagic.network.messages.sendParticleEffect
-import slatemagic.particle.SlateMagicParticles
-import slatemagic.particle.SpellCircleParticleEffect
 import slatemagic.shape.SpellShape
-import slatemagic.spell.effect.SpellEffect
 import slatemagic.spell.SpellContext
+import slatemagic.spell.effect.SpellEffect
 import kotlin.random.Random
 
 class RotationSpellEffect(val minimum: Vec2f, val maximum: Vec2f, val decorated: SpellEffect): SpellEffect {
 
     override fun use(context: SpellContext): SpellContext? {
         val rot=Vec2f(
-            lerp(minimum.x, maximum.x, Random.nextFloat())+context.direction.x,
-            lerp(minimum.x, maximum.x, Random.nextFloat())+context.direction.y
+            lerp(Random.nextFloat(), minimum.x, maximum.x)+context.direction.x,
+            lerp(Random.nextFloat(), minimum.y, maximum.y)+context.direction.y
         )
         context.direction=rot
-        sendParticleEffect(
-            context.world,
-            SpellCircleParticleEffect(SlateMagicParticles.SPELL_CROSSED, shape, ColorTools.int(color), 0.5f),
-            context.pos
-        )
         return decorated.use(context)
     }
 
@@ -48,7 +39,7 @@ class RotationSpellEffect(val minimum: Vec2f, val maximum: Vec2f, val decorated:
         val height=(minimum.x+maximum.x)/2
         if(height>60)str+="going up "
         else if(height<-60)str+="going down "
-        return Text.of(str).apply { siblings.add(decorated.name) }
+        return Text.of(str).apply { siblings.add(decorated.description) }
     }
 
     override val cost: Int get() = (decorated.cost*(1.0-maximum.add(minimum.negate()).length()/500.0)).toInt()

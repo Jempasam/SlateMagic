@@ -22,6 +22,8 @@ class ZoneSpellEffect(val zone: Vec3d, val decorated: SpellEffect): SpellEffect 
         var lastContext: SpellContext?=null
         for(target in targets){
             val subContext= SpellContext.at(target, context.power)
+            subContext.markeds.addAll(context.markeds)
+            subContext.direction=context.direction
             lastContext=decorated.use(subContext) ?: lastContext
         }
         sendParticleEffect(

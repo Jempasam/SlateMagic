@@ -10,17 +10,20 @@ import slatemagic.network.messages.sendParticleEffect
 import slatemagic.particle.MagicParticleEffect
 import slatemagic.shape.SpellShape
 import slatemagic.spell.SpellContext
+import slatemagic.spell.build.AssembledSpell
 import slatemagic.spell.effect.SpellEffect
 import kotlin.math.cbrt
 import kotlin.math.sqrt
 
-class TrapSpellEffect(val range: Float, val count: Int, val decorated: SpellEffect): SpellEffect {
+class TrapSpellEffect(val range: Float, val count: Int, val decorated: AssembledSpell): SpellEffect {
 
     override fun use(context: SpellContext): SpellContext? {
         val levelRange=range* cbrt(context.power.toFloat())
         val levelCount= count* sqrt(context.power.toDouble()).toInt()
         val trap=SpellTrapEntity(SlateMagicEntities.SPELL_TRAP, context.world, decorated, context.power, levelRange, levelCount)
         trap.setPosition(context.pos)
+        trap.pitch=context.direction.x
+        trap.yaw=context.direction.y
         context.world.spawnEntity(trap)
         sendParticleEffect(context.world,
             MagicParticleEffect(color, 0.5f),
@@ -32,18 +35,18 @@ class TrapSpellEffect(val range: Float, val count: Int, val decorated: SpellEffe
         return SpellContext.at(trap,context.power)
     }
 
-    override val name: Text get() = Text.of("Trap of ").also { it.siblings.add(decorated.name) }
+    override val name: Text get() = Text.of("Trap of ").also { it.siblings.add(decorated.effect.name) }
 
-    override val description: Text get() = Text.of("summon a trap with a range of $range that ").also { it.siblings.add(decorated.description) }
+    override val description: Text get() = Text.of("summon a trap with a range of $range that ").also { it.siblings.add(decorated.effect.description) }
 
-    override val cost: Int get() = (decorated.cost*(1.0+range/2.0)*count).toInt()
+    override val cost: Int get() = (decorated.effect.cost*(1.0+range/2.0)*count).toInt()
 
-    override val color: Vec3f get() = decorated.color.apply {
+    override val color: Vec3f get() = decorated.effect.color.apply {
         add(-0.05f,0.0f,-0.1f)
         clamp(0.0f,1.0f)
     }
 
-    override val shape: SpellShape get() = decorated.shape.also {
+    override val shape: SpellShape get() = decorated.effect.shape.also {
         if(it[3].cornerCount>4)it[3].cornerCount--
         else if(it[3].cornerCount<4)it[3].cornerCount++
         it[3].repetition++

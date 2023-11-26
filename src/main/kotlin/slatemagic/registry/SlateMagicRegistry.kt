@@ -1,20 +1,16 @@
 package slatemagic.registry
 
 import com.mojang.serialization.Lifecycle
-import net.minecraft.block.Blocks
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.effect.StatusEffects
-import net.minecraft.util.math.Vec3d
 import net.minecraft.util.registry.MutableRegistry
 import net.minecraft.util.registry.Registry
 import net.minecraft.util.registry.RegistryKey
 import net.minecraft.util.registry.SimpleRegistry
 import slatemagic.SlateMagicMod
+import slatemagic.spell.build.SlateMagicSpellNodes
 import slatemagic.spell.build.SpellNode
 import slatemagic.spell.build.SpellNodeDecoder
+import slatemagic.spell.build.assembleSpell
 import slatemagic.spell.effect.SpellEffect
-import slatemagic.spell.effect.action.*
-import slatemagic.spell.effect.move.*
 
 object SlateMagicRegistry {
 
@@ -31,39 +27,39 @@ object SlateMagicRegistry {
     fun clearNodes() = dynamicRegistry<SpellNode<*>>(key("effects"))
 
     init{
-        fun spell(id: String, spell: SpellEffect){
-            Registry.register(EFFECTS, SlateMagicMod.id(id), spell)
+        fun spell(id: String, vararg parts: SpellNode<*>){
+            Registry.register(EFFECTS, SlateMagicMod.id(id), listOf(*parts).assembleSpell().effect)
         }
-        spell("explosion", ExplosionSpellEffect())
-        spell("grenade", ProjectileSpellEffect(0.4f,100,ExplosionSpellEffect()))
-        spell("bounce_grenade", ProjectileSpellEffect(0.4f,100, ProjectileSpellEffect(0.4f,100,ExplosionSpellEffect())))
-        spell("canon", RaytraceSpellEffect(10, ExplosionSpellEffect()))
-        spell("machine_gun", TurretSpellEffect(20,10, RaytraceSpellEffect(10, ExplosionSpellEffect())))
-        spell("mine", TrapSpellEffect(5f,10, ExplosionSpellEffect()))
-        spell("auto_gun", TrapSpellEffect(10f,10, RaytraceSpellEffect(5, ExplosionSpellEffect())))
-        spell("bomb", TurretSpellEffect(100,1, ExplosionSpellEffect()))
 
-        spell("creeper", RaytraceSpellEffect(10, EntitySpellEffect(EntityType.CREEPER)))
-        spell("spider", RaytraceSpellEffect(10, EntitySpellEffect(EntityType.SPIDER)))
-        spell("cave_spider", RaytraceSpellEffect(10, EntitySpellEffect(EntityType.CAVE_SPIDER)))
-        spell("chicken", RaytraceSpellEffect(10, EntitySpellEffect(EntityType.CHICKEN)))
+        SlateMagicSpellNodes.apply {
+            spell("explosion", EXPLOSION2)
+            spell("grenade", GRENADE, EXPLOSION2)
+            spell("bounce_grenade", GRENADE, LOOK_UP, GRENADE, EXPLOSION2)
+            spell("canon", RAY, EXPLOSION2)
+            spell("machine_gun", TURRET, RAY, EXPLOSION)
+            spell("mine", TRAP, EXPLOSION2)
+            spell("auto_gun", TRAP, RAY, EXPLOSION)
+            spell("bomb", BOMB, EXPLOSION2)
 
-        spell("speed_cloud", PotionCloudSpellEffect(StatusEffects.SPEED))
-        spell("regeneration_cloud", PotionCloudSpellEffect(StatusEffects.REGENERATION))
+            spell("creeper", RAY, CREEPER)
+            spell("spider", RAY, SPIDER)
+            spell("cave_spider", RAY, CAVE_SPIDER)
 
-        spell("poison_cloud", PotionCloudSpellEffect(StatusEffects.POISON))
-        spell("poison_grenade", ProjectileSpellEffect(0.4f,100,
-            ZoneSpellEffect(Vec3d(4.0, 4.0,4.0), PotionSpellEffect(StatusEffects.POISON))
-        )
-        )
-        spell("poison_bomb", TurretSpellEffect(100,1, ZoneSpellEffect(Vec3d(8.0, 3.0,8.0), PotionSpellEffect(StatusEffects.POISON))))
-        spell("poison_trap", TrapSpellEffect(2f,1, ZoneSpellEffect(Vec3d(8.0, 3.0,8.0), PotionSpellEffect(StatusEffects.POISON))))
+            spell("speed_cloud", EFFECT_CLOUD, POTION_SPEED)
+            spell("regeneration_cloud", EFFECT_CLOUD, POTION_REGENERATION)
 
-        spell("levitation_zone", ZoneSpellEffect(Vec3d(8.0, 3.0,8.0), PotionSpellEffect(StatusEffects.LEVITATION)))
-        spell("self_speed", PotionSpellEffect(StatusEffects.SPEED))
+            spell("poison_cloud", EFFECT_CLOUD, POTION_POISON)
+            spell("poison_grenade", GRENADE, LARGE_ZONE, GIVE_EFFECT, POTION_POISON)
+            spell("poison_bomb", BOMB, LARGE_ZONE, GIVE_EFFECT, POTION_POISON)
+            spell("poison_trap", TRAP, ZONE, GIVE_EFFECT, POTION_POISON)
 
-        spell("fire", BlockSpellEffect(Blocks.FIRE))
-        spell("ice", BlockSpellEffect(Blocks.ICE))
+            spell("levitation_zone", LARGE_ZONE, GIVE_EFFECT, POTION_LEVITATION)
+            spell("self_speed", GIVE_EFFECT, POTION_SPEED)
+
+            spell("fire", SET_BLOCK, BLOCK_FIRE)
+            spell("ice", SET_BLOCK, BLOCK_ICE)
+
+        }
     }
 
     /* STATICS */

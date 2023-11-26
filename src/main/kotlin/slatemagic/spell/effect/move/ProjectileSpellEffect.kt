@@ -10,11 +10,12 @@ import slatemagic.network.messages.sendParticleEffect
 import slatemagic.particle.MagicParticleEffect
 import slatemagic.shape.SpellShape
 import slatemagic.spell.SpellContext
+import slatemagic.spell.build.AssembledSpell
 import slatemagic.spell.effect.SpellEffect
 import kotlin.math.max
 import kotlin.math.sqrt
 
-class ProjectileSpellEffect(val strength: Float, val duration: Int, val decorated: SpellEffect, val divergence: Float=0f):
+class ProjectileSpellEffect(val strength: Float, val duration: Int, val decorated: AssembledSpell, val divergence: Float=0f):
     SpellEffect {
 
     override fun use(context: SpellContext): SpellContext? {
@@ -37,21 +38,21 @@ class ProjectileSpellEffect(val strength: Float, val duration: Int, val decorate
     }
 
     override val name: Text get() {
-        return Text.of("Gun of ").also { it.siblings.add(decorated.name) }
+        return Text.of("Gun of ").also { it.siblings.add(decorated.effect.name) }
     }
 
     override val description: Text get(){
-        return Text.of("shoot a projectile that ").also { it.siblings.add(decorated.description) }
+        return Text.of("shoot a projectile that ").also { it.siblings.add(decorated.effect.description) }
     }
 
-    override val cost: Int get() = (decorated.cost*(1f+duration/40f+strength/1f)).toInt()
+    override val cost: Int get() = (decorated.effect.cost*(1f+duration/40f+strength/1f)).toInt()
 
-    override val color: Vec3f get() = decorated.color.apply {
+    override val color: Vec3f get() = decorated.effect.color.apply {
         add(0.1f,0.1f,0.1f)
         clamp(0.0f,1.0f)
     }
 
-    override val shape: SpellShape get() = decorated.shape.also {
+    override val shape: SpellShape get() = decorated.effect.shape.also {
         it[2].apply {
             this.cornerCount= 6
             this.succionDepth= (this.succionDepth + 80*max(1f,strength/1f+duration/400f)).toInt().toByte()

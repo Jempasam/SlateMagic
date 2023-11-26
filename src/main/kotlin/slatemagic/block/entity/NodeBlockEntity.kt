@@ -86,5 +86,5 @@ fun fetchNodes(world: World, pos: BlockPos, direction: Direction): Triple<BlockP
 
 fun fetchSpellPart(world: World, pos: BlockPos, direction: Direction): Triple<BlockPos,Direction,SpellPart<*>>{
     val (epos,edirection,nodes)=fetchNodes(world,pos,direction)
-    return Triple(epos,edirection,assemble(nodes))
+    return Triple(epos,edirection,nodes.assemble())
 }

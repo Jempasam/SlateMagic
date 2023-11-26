@@ -7,6 +7,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.Box
+import net.minecraft.util.math.Vec2f
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 import slatemagic.network.messages.AdvancedParticleMessage
@@ -14,7 +15,7 @@ import slatemagic.network.messages.sendParticleEffect
 import slatemagic.particle.AdvancedParticle
 import slatemagic.particle.MagicParticleEffect
 import slatemagic.spell.SpellContext
-import slatemagic.spell.effect.SpellEffect
+import slatemagic.spell.build.AssembledSpell
 import kotlin.math.min
 import kotlin.random.Random
 
@@ -34,7 +35,7 @@ class SpellTrapEntity : SimpleSpellEntity{
 
     constructor(type: EntityType<*>, world: World) : super(type, world)
 
-    constructor(type: EntityType<*>, world: World, spell: SpellEffect, power: Int, range: Float, remainingShoot: Int)
+    constructor(type: EntityType<*>, world: World, spell: AssembledSpell, power: Int, range: Float, remainingShoot: Int)
             : super(type, world, spell, power)
     {
         this.range = range
@@ -49,6 +50,7 @@ class SpellTrapEntity : SimpleSpellEntity{
 
     override fun tick() {
         super.tick()
+
         val world=world
         if(!world.isClient){
             world as ServerWorld
@@ -61,6 +63,8 @@ class SpellTrapEntity : SimpleSpellEntity{
                     val target=collisions[i]
                     lookAt(EntityAnchorArgumentType.EntityAnchor.FEET, target.pos)
                     val context= SpellContext.at(this, power)
+                    context.markeds.addAll(markeds)
+                    context.direction= Vec2f(yaw, pitch)
                     val result=spell.use(context)
                     if(result!=null){
                         remainingshoot--

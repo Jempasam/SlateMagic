@@ -6,13 +6,14 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3f
 import slatemagic.helper.ColorTools
 import slatemagic.shape.SpellShape
-import slatemagic.spell.effect.SpellEffect
 import slatemagic.spell.SpellContext
+import slatemagic.spell.effect.SpellEffect
 
 class BlockSpellEffect(val block: Block): SpellEffect {
 
     override fun use(context: SpellContext): SpellContext? {
-        context.world.setBlockState(BlockPos(context.pos),block.defaultState)
+        val bpos=BlockPos(context.pos)
+        if(context.world.isAir(bpos))context.world.setBlockState(bpos,block.defaultState)
         return context
     }
 

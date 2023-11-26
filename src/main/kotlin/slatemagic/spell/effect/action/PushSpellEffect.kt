@@ -48,14 +48,13 @@ class PushSpellEffect(val strength: Float): SpellEffect {
 
     override val cost: Int get() = (5*strength).toInt()
 
-    override val color: Vec3f get() = ColorTools.vec(0xD80064).copy().apply {lerp(ColorTools.vec(0xD80034), min(1f,strength))}
+    override val color: Vec3f get() = ColorTools.vec(0xBED3FF).copy().apply {lerp(ColorTools.vec(0xDFF5FF), min(1f,strength))}
 
     override val shape: SpellShape get() = SpellShape(
-        Array(4) {SpellShape.Circle(3, 0, 0, 0, 1, 0, 0)}
+        Array(4) {SpellShape.Circle(3, 30, 0, 0, 1, -20, 1)}
         .also {
-            it[0]= SpellShape.Circle(16, 0, 0, 0, 1, 0, 0)
-            it[2].spacing=60
-            it[3]= SpellShape.Circle(16, 0, 0, 0, 2, 0, 0)
+            for(i in arrayOf(1,3))
+                it[i]= SpellShape.Circle(6, 30, 0, 0, 1, 10, 3)
         }
     )
 }

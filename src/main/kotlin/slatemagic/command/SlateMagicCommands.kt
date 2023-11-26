@@ -47,9 +47,9 @@ object SlateMagicCommands {
             is List<*> -> {
                 val nodes=arg as List<SpellNode<*>>
                 try{
-                    val result = assemble(nodes)
+                    val result = nodes.assemble()
                     if(result.type != SPELL_PART)throw CommandException(Text.of("Not a spell"))
-                    return SPELL_PART.get(result)
+                    return SPELL_PART.get(result).effect
                 }catch(e:Exception){
                     throw CommandException(Text.of(e.message))
                 }
@@ -61,7 +61,7 @@ object SlateMagicCommands {
                     val (pos,direction,part)= fetchSpellPart(source.world,blockpos,Direction.UP)
 
                     if(part.type != SPELL_PART)throw CommandException(Text.of("Not a spell"))
-                    val spell=SPELL_PART.get(part)
+                    val spell=SPELL_PART.get(part).effect
 
                     val ppos= Vec3d.ofCenter(pos.offset(direction))
                     source.world.spawnParticles(
@@ -188,7 +188,7 @@ object SlateMagicCommands {
             .executes { context ->
                 val nodes = ListArgumentType.get<SpellNode<*>>(context,"nodes")
                 try{
-                    val result = assemble(nodes)
+                    val result = nodes.assemble()
                     val text = Text.of("${result.type.name}: ${result}")
                     context.source.sendMessage(text)
                     1

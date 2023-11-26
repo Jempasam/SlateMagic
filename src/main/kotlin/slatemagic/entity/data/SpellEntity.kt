@@ -1,11 +1,14 @@
 package slatemagic.entity.data
 
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.nbt.NbtElement
+import net.minecraft.nbt.NbtList
+import net.minecraft.nbt.NbtOps
 import net.minecraft.network.PacketByteBuf
-import net.minecraft.util.Identifier
+import net.minecraft.util.math.Vec3d
 import slatemagic.helper.ColorTools
-import slatemagic.registry.SlateMagicRegistry
 import slatemagic.shape.SpellShape
+import slatemagic.spell.build.AssembledSpell
 import slatemagic.spell.effect.SpellEffect
 import slatemagic.spell.effect.StubSpellEffect
 
@@ -13,7 +16,9 @@ interface SpellEntity {
 
     val spellData: Data
 
-    var spell: SpellEffect
+    val spell: SpellEffect get() = assembled.effect
+
+    var assembled: AssembledSpell
         get() = spellData.spell
         set(v) { spellData.spell = v }
 
@@ -21,39 +26,47 @@ interface SpellEntity {
         get() = spellData.power
         set(v) { spellData.power = v }
 
-    class Data(var spell: SpellEffect, var power: Int){
+    var markeds: List<Vec3d>
+        get() = spellData.marked
+        set(v) { spellData.marked = v }
 
-        constructor(): this(StubSpellEffect.INSTANCE, 1)
+    class Data(var spell: AssembledSpell, var power: Int, var marked: List<Vec3d>){
+
+        constructor(): this(AssembledSpell.STUB, 1, listOf())
 
         fun read(buf: PacketByteBuf){
             try{
                 power=buf.readInt()
                 val shape=SpellShape(buf.readString())
-                spell= StubSpellEffect(ColorTools.vec(buf.readInt()), shape)
+                spell= AssembledSpell(listOf(),StubSpellEffect(ColorTools.vec(buf.readInt()), shape))
             }catch (e: Exception){
-                spell= StubSpellEffect.INSTANCE
+                spell= AssembledSpell.STUB
                 power=1
             }
         }
 
         fun write(buf: PacketByteBuf){
             buf.writeInt(power)
-            buf.writeString(spell.shape.toCode())
-            buf.writeInt(ColorTools.int(spell.color))
+            buf.writeString(spell.effect.shape.toCode())
+            buf.writeInt(ColorTools.int(spell.effect.color))
         }
 
         fun read(nbt: NbtCompound){
-            spell=nbt.getString("spell")
-                ?.let { Identifier.tryParse(it) }
-                ?.let { SlateMagicRegistry.EFFECTS.get(it) }
-                ?: StubSpellEffect.INSTANCE
+            spell=nbt.get("spell") ?.let{ AssembledSpell.fromNbt(it) } ?:AssembledSpell.STUB
             power=nbt.getInt("power")
+            marked=nbt.getList("markeds", NbtElement.LIST_TYPE.toInt()).map {m ->
+                Vec3d.CODEC.decode(NbtOps.INSTANCE, m).get().orThrow().first
+            }
         }
 
         fun write(nbt: NbtCompound){
-            spell.let{SlateMagicRegistry.EFFECTS.getId(it)}
-                ?.let { nbt.putString("spell", it.toString()) }
+            nbt.put("spell", spell.toNbt())
             nbt.putInt("power", power)
+            nbt.put("markeds", NbtList().apply {
+                for(m in marked){
+                    add(Vec3d.CODEC.encode(m, NbtOps.INSTANCE, NbtList()).get().orThrow())
+                }
+            })
         }
     }
 }

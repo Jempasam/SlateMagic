@@ -14,7 +14,7 @@ data class SpellContext private constructor(
     private var _entity: Entity?
 ) {
 
-    var markeds: MutableList<Vec3d> = mutableListOf()
+    val markeds: MutableList<Vec3d> = mutableListOf()
 
     val entity: Entity?
         get() = _entity
@@ -25,6 +25,12 @@ data class SpellContext private constructor(
             _pos=value
             _entity=null
         }
+
+    fun copy(world: ServerWorld=this.world, pos: Vec3d=this.pos, direction: Vec2f=this.direction, power: Int=this.power): SpellContext{
+        val ret=SpellContext(world, pos, direction, power, if(pos===_pos)_entity else null)
+        ret.markeds.addAll(markeds)
+        return ret
+    }
 
     companion object{
 
