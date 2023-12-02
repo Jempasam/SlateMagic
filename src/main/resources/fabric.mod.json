@@ -1,8 +1,8 @@
 {
 	"schemaVersion": 1,
-	"id": "slate-magic",
+	"id": "slab-magic",
 	"version": "${version}",
-	"name": "Slate Magic",
+	"name": "Slab Magic",
 	"description": "This is an example description! Tell everyone what your mod is about!",
 	"authors": [
 		"Me!"
@@ -12,32 +12,32 @@
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/slate-magic/icon.png",
+	"icon": "assets/slab-magic/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
 			{
-				"value": "slatemagic.SlateMagicMod",
+				"value": "slabmagic.SlabMagicMod",
 				"adapter": "kotlin"
 			}
 		],
 		"client": [
 			{
-				"value": "slatemagic.SlateMagicModClient",
+				"value": "slabmagic.SlabMagicModClient",
 				"adapter": "kotlin"
 			}
 		],
 		"fabric-datagen": [
 			{
-				"value": "slatemagic.datagen.SlateMagicDataGenerator",
+				"value": "slabmagic.datagen.SlabMagicDataGenerator",
 				"adapter": "kotlin"
 			}
 		]
 	},
 	"mixins": [
-		"slate-magic.mixins.json",
+		"slab-magic.mixins.json",
 		{
-			"config": "slate-magic.client.mixins.json",
+			"config": "slab-magic.client.mixins.json",
 			"environment": "client"
 		}
 	],

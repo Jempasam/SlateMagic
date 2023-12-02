@@ -1,2 +1,2 @@
-# SlateMagic
-Spell creation using slate construction.
+# SlabMagic
+Spell creation using slab construction.

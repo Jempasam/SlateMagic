@@ -22,7 +22,7 @@ loom {
     splitEnvironmentSourceSets()
 
 	mods {
-		"slate-magic" {
+		"slab-magic" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}
