@@ -16,9 +16,8 @@ import net.minecraft.text.MutableText
 import net.minecraft.text.Style
 import net.minecraft.text.Text
 import net.minecraft.util.math.Direction
-import net.minecraft.util.math.Vec3d
 import slabmagic.SlabMagicMod
-import slabmagic.block.entity.fetchSpellPart
+import slabmagic.block.entity.visitAt
 import slabmagic.command.commands.ParticleEffectCommand
 import slabmagic.command.type.ListArgumentType
 import slabmagic.command.type.RegistryArgumentType
@@ -30,7 +29,9 @@ import slabmagic.shape.painter.GraphicsPainter
 import slabmagic.spell.SpellContext
 import slabmagic.spell.build.parts.AssembledSpell
 import slabmagic.spell.build.parts.SpellPart
-import slabmagic.spell.build.parts.assemble
+import slabmagic.spell.build.parts.assembleSpell
+import slabmagic.spell.build.parts.visitAll
+import slabmagic.spell.build.visitor.AssemblingNodeVisitor
 import slabmagic.spell.effect.SpellEffect
 import java.awt.image.BufferedImage
 import java.io.File
@@ -48,9 +49,7 @@ object SlabMagicCommands {
             is List<*> -> {
                 val nodes=arg as List<SpellPart<*>>
                 try{
-                    val result = nodes.assemble()
-                    if(result.type != SPELL_PART)throw CommandException(Text.of("Not a spell"))
-                    return SPELL_PART.get(result).effect
+                    return nodes.assembleSpell()?.effect ?: throw CommandException(Text.of("Not a spell"))
                 }catch(e:Exception){
                     throw CommandException(Text.of(e.message))
                 }
@@ -59,20 +58,10 @@ object SlabMagicCommands {
             is PosArgument -> {
                 try{
                     val blockpos=arg.toAbsoluteBlockPos(source)
-                    val (pos,direction,part)= fetchSpellPart(source.world,blockpos,Direction.UP)
-
-                    if(part.type != SPELL_PART)throw CommandException(Text.of("Not a spell"))
-                    val spell=SPELL_PART.get(part).effect
-
-                    val ppos= Vec3d.ofCenter(pos.offset(direction))
-                    source.world.spawnParticles(
-                        SpellCircleParticleEffect.circle(spell, 1f, 50),
-                        ppos.x, ppos.y, ppos.z,
-                        1,0.0,0.0,0.0,
-                        0.0
-                    )
-                    print("Spell {${spell.name.string}} at $pos, facing $direction")
-                    return spell
+                    val visitor= AssemblingNodeVisitor()
+                    visitor.visitAt(source.world,blockpos,Direction.UP)
+                    return visitor?.result?.first?.let(SPELL_PART::cast)?.effect
+                        ?: throw CommandException(Text.of("Not a spell"))
                 }
                 catch (e: CommandException){ throw e }
                 catch (e: Throwable){ throw CommandException(Text.of(e.message)) }
@@ -189,7 +178,9 @@ object SlabMagicCommands {
             .executes { context ->
                 val nodes = ListArgumentType.get<SpellPart<*>>(context,"nodes")
                 try{
-                    val result = nodes.assemble()
+                    val visitor=AssemblingNodeVisitor()
+                    visitor.visitAll(nodes)
+                    val result=visitor.result?.first ?: throw CommandException(Text.of("Invalid node assembling"))
                     val text = Text.of("${result.type.name}: ${result}")
                     context.source.sendMessage(text)
                     1

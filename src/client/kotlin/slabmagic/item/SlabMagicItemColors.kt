@@ -10,5 +10,6 @@ object SlabMagicItemColors {
         ColorProviderRegistry.ITEM.register(NodeBlockItemColor, SlabMagicItems.SLAB)
         ColorProviderRegistry.ITEM.register(SpellItemColor, SlabMagicItems.SPELL_ORB)
         ColorProviderRegistry.ITEM.register(SpellItemColor, SlabMagicItems.SPELL_DUST)
+        ColorProviderRegistry.ITEM.register(SpellItemColor, SlabMagicItems.SPELL_SWORD)
     }
 }

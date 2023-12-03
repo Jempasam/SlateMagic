@@ -20,12 +20,8 @@ import slabmagic.particle.SpellCircleParticleEffect
 import slabmagic.registry.SlabMagicRegistry
 import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
-import slabmagic.spell.build.node.visitor.AmbiguousPartNodeException
-import slabmagic.spell.build.node.visitor.SpellNodeVisitor
 import slabmagic.spell.build.parts.SlabMagicSpellParts
-import slabmagic.spell.build.parts.SpellBuildResult
 import slabmagic.spell.build.parts.SpellPart
-import slabmagic.spell.build.parts.assemble
 import slabmagic.spell.build.visitor.AmbiguousPartVisitorException
 import slabmagic.spell.build.visitor.NodeVisitor
 import slabmagic.spell.build.visitor.Visited
@@ -72,72 +68,6 @@ open class NodeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, state: Block
     }
 }
 
-fun fetchNodes(list: MutableList<SpellPart<*>>, world: World, pos: BlockPos, direction: Direction): Pair<BlockPos,Direction>?{
-    // Performance Tests
-    if(world.isAir(pos))return null
-
-    val blockEntity=world.getBlockEntity(pos)
-    if(blockEntity is NodeBlockEntity){
-        blockEntity.node?.let { list.add(it) }
-        var finded: Pair<BlockPos,Direction>?=null
-        for(next_direction in Direction.entries)if(next_direction!=direction.opposite){
-            val next_pos=pos.offset(next_direction)
-            val fetched=fetchNodes(list,world,next_pos,next_direction)
-            if(fetched!=null){
-                if(finded!=null)throw Exception("Slab has more than one connection")
-                finded=fetched
-            }
-        }
-        return finded ?: Pair(pos,direction)
-    }
-    return null
-}
-
-fun fetchNodes(world: World, pos: BlockPos, direction: Direction): Triple<BlockPos,Direction,List<SpellPart<*>>>{
-    val list= mutableListOf<SpellPart<*>>()
-    val end= fetchNodes(list,world,pos,direction) ?: throw Exception("Invalid Slab Position")
-    if(list.isEmpty()) throw Exception("Empty Slab Structure")
-    return Triple(end.first,end.second,list)
-}
-
-fun fetchSpellPart(world: World, pos: BlockPos, direction: Direction): Triple<BlockPos,Direction,SpellBuildResult<*>>{
-    val (epos,edirection,nodes)=fetchNodes(world,pos,direction)
-    return Triple(epos,edirection,nodes.assemble())
-}
-
-
-fun <V: SpellNodeVisitor<V>> visitNodes(previous: SpellPart<*>, world: World, pos: BlockPos, direction: Direction, visitor: V): SpellPart<*>?{
-    // Performance Tests
-    if(world.isAir(pos))return null
-
-    val blockEntity=world.getBlockEntity(pos)
-    if(blockEntity is NodeBlockEntity){
-        val part=blockEntity.node
-        part?.let { visitor.visit(world,pos,direction,it) }
-        val previous=part ?: previous
-        var finded: SpellPart<*>?=null
-        for(next_direction in Direction.entries)if(next_direction!=direction.opposite){
-            val next_pos=pos.offset(next_direction)
-            val fetched=visitNodes(previous,world,next_pos,next_direction,visitor)
-            if(fetched!=null){
-                if(finded!=null){
-                    val except=AmbiguousPartNodeException(previous,finded,fetched)
-                    visitor.exception(world,pos,direction,except)
-                    throw except
-                }
-                finded=fetched
-            }
-        }
-        if(finded==null)visitor.end(world,pos,direction)
-        return previous
-    }
-    return null
-}
-
-
-fun <V: SpellNodeVisitor<V>> visitNodes(world: World, pos: BlockPos, direction: Direction, visitor: V){
-    visitNodes(SlabMagicSpellParts.STUB,world,pos,direction,visitor)
-}
 
 class NodeBlockVisited(val world: World, val pos: BlockPos, val direction: Direction): Visited{
     override fun error(exception: VisitorException){

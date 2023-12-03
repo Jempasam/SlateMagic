@@ -32,12 +32,10 @@ class SpellCastingItem(settings: Settings) : Item(settings), SpellItem {
     override fun getName(stack: ItemStack) = Text.translatable(translationKey, getSpellName(stack))
 
     override fun appendTooltip(stack: ItemStack, world: World?, tooltip: MutableList<Text>, context: TooltipContext) {
-        val desc=getSpell(stack).effect.description.copy()
         val spell=getSpellName(stack)
         val color=getColor(stack)
         val power=getPower(stack)
         tooltip.add(Text.literal(spell+" "+power).setStyle(Style.EMPTY.withColor(color)))
-        tooltip.add(desc.setStyle(Style.EMPTY.withColor(color)))
         super.appendTooltip(stack, world, tooltip, context)
     }
 

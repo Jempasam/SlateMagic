@@ -35,7 +35,7 @@ class SpellItemSpellEffect(val item: Item, val count: Int, val decorated: Assemb
 
     override val name: Text get() = Text.of("Tool of ").also { it.siblings.add(decorated.effect.name) }
 
-    override val description: Text get() = Text.of("give a item that, on use, that ").also { it.siblings.add(decorated.effect.description) }
+    override val description: Text get() = Text.of("give a item that, on use, ").also { it.siblings.add(decorated.effect.description) }
 
     override val cost: Int get() = decorated.effect.cost * count * max(1,item.maxDamage)
 

@@ -11,8 +11,10 @@
   "item.slab-magic.cost_wand": "Totem Cost Wand",
   "item.slab-magic.desc_wand": "Totem Description Wand",
   "item.slab-magic.lens": "Lens",
+
   "item.slab-magic.spell_dust": "Dust of %s",
   "item.slab-magic.spell_orb": "Orb Of %s",
+  "item.slab-magic.spell_sword": "Sword Of %s",
 
   "itemGroup.slab-magic.main": "Slab Magic",
   "itemGroup.slab-magic.tools": "Tools",

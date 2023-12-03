@@ -15,7 +15,7 @@ class PierceSpellEffect(val decorated: SpellEffect): SpellEffect by decorated {
     override fun use(context: SpellContext): SpellContext? {
         val original=context.pos
         val actual=Vector3d(context.pos.x, context.pos.y, context.pos.z)
-        val directionVector=Vec3d.fromPolar(context.direction.x,context.direction.y).multiply(0.05)
+        val directionVector=Vec3d.fromPolar(context.direction.x,context.direction.y).multiply(0.2)
         val leveledMaxDistance= 20
         for(i in 0..<leveledMaxDistance){
             val blockpos=BlockPos(actual.x,actual.y,actual.z)

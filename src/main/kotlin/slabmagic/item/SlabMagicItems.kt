@@ -30,6 +30,7 @@ object SlabMagicItems {
 
     val SPELL_ORB = register("spell_orb", SpellCastingItem(Item.Settings().group(SlabMagicGroups.SPELLS).maxDamage(10)))
     val SPELL_DUST = register("spell_dust", SpellCastingItem(Item.Settings().group(SlabMagicGroups.SPELLS)))
+    val SPELL_SWORD = register("spell_sword", SpellCastingWeaponItem(Item.Settings().group(SlabMagicGroups.SPELLS)))
 
     val LENS= register("lens", Item(Item.Settings().group(SlabMagicGroups.TOOLS).maxCount(1)))
 }
