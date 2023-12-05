@@ -30,6 +30,7 @@ object SlabMagicModClient : ClientModInitializer {
 		HudRenderCallback.EVENT.register(GlassesHudRenderCallback)
 
 		BlockRenderLayerMap.INSTANCE.putBlock(SlabMagicBlocks.SLAB,RenderLayer.getCutout())
+		BlockRenderLayerMap.INSTANCE.putBlock(SlabMagicBlocks.CONTAMINATED_REDSTONE_HEART,RenderLayer.getTranslucent())
 	}
 
 }

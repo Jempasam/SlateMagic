@@ -8,8 +8,8 @@ import slabmagic.network.messages.sendParticleEffect
 import slabmagic.particle.SlabMagicParticles
 import slabmagic.particle.SpellCircleParticleEffect
 import slabmagic.shape.SpellShape
-import slabmagic.spell.effect.SpellEffect
 import slabmagic.spell.SpellContext
+import slabmagic.spell.effect.SpellEffect
 
 class EntitySpellEffect(val type: EntityType<*>): SpellEffect {
     override fun use(context: SpellContext): SpellContext? {
@@ -23,7 +23,7 @@ class EntitySpellEffect(val type: EntityType<*>): SpellEffect {
         return SpellContext.at(spawned, context.power)
     }
 
-    override val name: Text get() = type.name
+    override val name: Text get() = type.name.copy()
 
     override val description: Text get() = Text.of("summon a ").apply { siblings.add(type.name) }
 

@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "slab-magic:redstone_heart",
+    "slab-magic:contaminated_redstone_heart",
+    "slab-magic:slab"
+  ]
+}
+

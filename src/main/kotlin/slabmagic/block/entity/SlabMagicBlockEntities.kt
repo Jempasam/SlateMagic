@@ -10,7 +10,9 @@ import slabmagic.block.SlabMagicBlocks
 
 object SlabMagicBlockEntities {
 
-    val SLAB: BlockEntityType<NodeBlockEntity> = create("slab", arrayOf(SlabMagicBlocks.SLAB), ::SlabBlockEntity)
+    val SPELL_PART: BlockEntityType<PartBlockEntity> = create("slab", arrayOf(SlabMagicBlocks.SLAB), PartBlockEntity::factory)
+
+    val SPELL: BlockEntityType<SpellBlockEntity> = create("spell", arrayOf(SlabMagicBlocks.SLAB), SpellBlockEntity::factory)
 
     fun <T: BlockEntity> create(id: String, blocks: Array<Block>, factory: FabricBlockEntityTypeBuilder.Factory<T>): BlockEntityType<T>{
         val type=FabricBlockEntityTypeBuilder.create(factory, *blocks).build()

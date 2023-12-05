@@ -4,7 +4,6 @@ import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.StateManager
-import net.minecraft.state.property.BooleanProperty
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.World
@@ -14,10 +13,6 @@ import slabmagic.spell.build.visitor.AssemblingNodeVisitor
 import slabmagic.spell.build.visitor.VisitorException
 
 class ActivatorBlock(settings: Settings, val smart: Boolean): Block(settings) {
-
-    companion object{
-        val TRIGGERED=BooleanProperty.of("triggered")
-    }
 
     init {
         defaultState=defaultState.with(TRIGGERED,false)

@@ -30,7 +30,9 @@ bin/
 
 # fabric
 
-run/
+run
+src/main/generated
+src/client/generated
 
 # java
 

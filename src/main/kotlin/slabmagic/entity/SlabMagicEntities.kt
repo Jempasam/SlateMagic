@@ -27,6 +27,14 @@ object SlabMagicEntities {
         dimensions(EntityType.FIREBALL.dimensions)
     }
 
+    val SPELL_ENCHANTING = register("spell_enchanting", ::SpellEnchantingEntity){
+        dimensions(EntityType.FIREBALL.dimensions)
+    }
+
+    val SPELL_SHIELD = register("spell_shield", ::SpellShieldEntity){
+        dimensions(EntityType.FIREBALL.dimensions)
+    }
+
 
     fun <T: Entity>register(id: String, factory: EntityFactory<T>, builder: FabricEntityTypeBuilder<T>.()->Unit): EntityType<T> {
         val type=FabricEntityTypeBuilder.create(SpawnGroup.MISC,factory).apply{builder()}.build()

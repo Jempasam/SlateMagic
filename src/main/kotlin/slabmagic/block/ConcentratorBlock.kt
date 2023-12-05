@@ -4,7 +4,6 @@ import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.StateManager
-import net.minecraft.state.property.BooleanProperty
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.World
@@ -23,8 +22,6 @@ class ConcentratorBlock(val action: Action, settings: Settings): Block(settings)
     }
 
     companion object{
-        val TRIGGERED=BooleanProperty.of("triggered")
-
         fun castPower(visited: Visited, spell: AssembledSpell, power: Int){
             visited.cast(spell.effect,power)
         }

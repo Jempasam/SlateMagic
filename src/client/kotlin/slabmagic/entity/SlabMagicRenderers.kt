@@ -9,5 +9,7 @@ object SlabMagicRenderers {
         EntityRendererRegistry.register(SlabMagicEntities.SPELL_TRAP, ::SpellTrapRenderer)
         EntityRendererRegistry.register(SlabMagicEntities.SPELL_CURSE, ::SpellCurseRenderer)
         EntityRendererRegistry.register(SlabMagicEntities.SPELL_PROJECTILE, ProjectileCrossedRenderer.Factory(0.5f))
+        EntityRendererRegistry.register(SlabMagicEntities.SPELL_SHIELD, ::SpellShieldRenderer)
+        EntityRendererRegistry.register(SlabMagicEntities.SPELL_ENCHANTING, ::SpellShieldRenderer)
     }
 }

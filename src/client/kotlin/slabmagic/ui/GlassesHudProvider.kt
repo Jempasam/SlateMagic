@@ -7,15 +7,15 @@ import net.minecraft.item.Items
 import net.minecraft.text.Style
 import net.minecraft.text.Text
 import net.minecraft.util.math.BlockPos
-import slabmagic.block.entity.NodeBlockEntity
+import slabmagic.block.entity.PartBlockEntity
 import slabmagic.helper.ColorTools
 import slabmagic.item.SlabMagicItems
 
 object GlassesHudProvider: GlassesHudRenderCallback.Provider {
     override fun get(state: BlockState, pos: BlockPos): List<GlassesHudRenderCallback.Part> {
         val block= MinecraftClient.getInstance().world?.getBlockEntity(pos)
-        return if(block is NodeBlockEntity) {
-            val (stack, text) = block.node?.let {
+        return if(block is PartBlockEntity) {
+            val (stack, text) = block.part?.let {
                 val color = Style.EMPTY.withColor(ColorTools.int(it.color))
                 val text = it.name.copy().setStyle(color).apply {
                     if(it.parameters.isNotEmpty()) append(" -> ")

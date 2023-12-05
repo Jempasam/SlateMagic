@@ -7,7 +7,7 @@ import net.minecraft.text.Style
 import net.minecraft.text.Text
 import net.minecraft.util.ActionResult
 import net.minecraft.util.DyeColor
-import slabmagic.block.entity.NodeBlockEntity
+import slabmagic.block.entity.PartBlockEntity
 import slabmagic.block.entity.visitAt
 import slabmagic.helper.ColorTools
 import slabmagic.spell.build.parts.AssembledSpell
@@ -19,7 +19,7 @@ import slabmagic.spell.build.visitor.VisitorException
 class WandItem(val action: (Visited, ServerPlayerEntity?, AssembledSpell) -> ActionResult, settings: Settings) : Item(settings) {
 
     override fun useOnBlock(context: ItemUsageContext): ActionResult {
-        if(context.world.getBlockEntity(context.blockPos) is NodeBlockEntity){
+        if(context.world.getBlockEntity(context.blockPos) is PartBlockEntity){
             if(!context.world.isClient){
                 val visitor= AssemblingNodeVisitor()
                 try{

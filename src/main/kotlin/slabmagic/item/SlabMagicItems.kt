@@ -26,6 +26,9 @@ object SlabMagicItems {
     val ACTIVATOR_CONCENTRATOR = register("activator_concentrator", BlockItem(SlabMagicBlocks.ACTIVATOR_CONCENTRATOR, Item.Settings().group(SlabMagicGroups.TOOLS)))
     val UPGRADED_ACTIVATOR_CONCENTRATOR = register("upgraded_activator_concentrator", BlockItem(SlabMagicBlocks.UPGRADED_ACTIVATOR_CONCENTRATOR, Item.Settings().group(SlabMagicGroups.TOOLS)))
 
+    val REDSTONE_HEART = register("redstone_heart", BlockItem(SlabMagicBlocks.REDSTONE_HEART, Item.Settings().group(SlabMagicGroups.TOOLS)))
+    val CONTAMINATED_REDSTONE_HEART = register("contaminated_redstone_heart", BlockItem(SlabMagicBlocks.CONTAMINATED_REDSTONE_HEART, Item.Settings().group(SlabMagicGroups.TOOLS)))
+
     val SLAB = register("slab", NodeBlockItem(SlabMagicBlocks.SLAB, Item.Settings().group(SlabMagicGroups.SLABS)))
 
     val SPELL_ORB = register("spell_orb", SpellCastingItem(Item.Settings().group(SlabMagicGroups.SPELLS).maxDamage(10)))

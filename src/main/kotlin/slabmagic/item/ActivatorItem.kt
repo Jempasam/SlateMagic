@@ -9,7 +9,7 @@ import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
 import net.minecraft.util.TypedActionResult
 import net.minecraft.world.World
-import slabmagic.block.entity.NodeBlockEntity
+import slabmagic.block.entity.PartBlockEntity
 import slabmagic.block.entity.visitAt
 import slabmagic.spell.build.parts.SPELL
 import slabmagic.spell.build.visitor.AssemblingNodeVisitor
@@ -37,7 +37,7 @@ class ActivatorItem(settings: Settings) : Item(settings) {
     override fun useOnBlock(context: ItemUsageContext): ActionResult {
         if(context.player?.isSneaking ?: false)return ActionResult.PASS
 
-        if(context.world.getBlockEntity(context.blockPos) is NodeBlockEntity){
+        if(context.world.getBlockEntity(context.blockPos) is PartBlockEntity){
             if(!context.world.isClient){
                 val visitor= AssemblingNodeVisitor()
                 try{

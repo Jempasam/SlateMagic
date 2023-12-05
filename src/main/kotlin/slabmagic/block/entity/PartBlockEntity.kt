@@ -5,8 +5,6 @@ import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.network.Packet
-import net.minecraft.network.listener.ClientPlayPacketListener
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.text.Text
@@ -29,9 +27,9 @@ import slabmagic.spell.build.visitor.VisitorException
 import slabmagic.spell.effect.SpellEffect
 
 
-open class NodeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, state: BlockState) : BlockEntity(type, pos, state){
+open class PartBlockEntity(type: BlockEntityType<*>, pos: BlockPos, state: BlockState) : BlockEntity(type, pos, state){
 
-    var node: SpellPart<*>? = null
+    var part: SpellPart<*>? = null
         get() = field
         set(value){
             field = value
@@ -45,26 +43,28 @@ open class NodeBlockEntity(type: BlockEntityType<*>, pos: BlockPos, state: Block
         }
 
     override fun writeNbt(nbt: NbtCompound) {
-        node ?.let{SlabMagicRegistry.PARTS.getId(node)}?.let { nbt.putString("node", it.toString()) }
+        part ?.let{SlabMagicRegistry.PARTS.getId(part)}?.let { nbt.putString("node", it.toString()) }
     }
 
     override fun readNbt(nbt: NbtCompound) {
         nbt.getString("node")
             ?.let{ Identifier.tryParse(it) }
             ?.let { SlabMagicRegistry.PARTS.get(it) }
-            ?.let { node = it }
+            ?.let { part = it }
         val world=world
         if(world!=null && world.isClient){
             world.updateListeners(pos,world.getBlockState(pos),world.getBlockState(pos),Block.NOTIFY_LISTENERS);
         }
     }
 
-    override fun toUpdatePacket(): Packet<ClientPlayPacketListener> {
-        return BlockEntityUpdateS2CPacket.create(this)
-    }
+    override fun toUpdatePacket() = BlockEntityUpdateS2CPacket.create(this)
 
-    override fun toInitialChunkDataNbt(): NbtCompound {
-        return createNbt()
+    override fun toInitialChunkDataNbt() = createNbt()
+
+    companion object{
+        fun factory(pos: BlockPos, state: BlockState)
+            = PartBlockEntity(SlabMagicBlockEntities.SPELL_PART, pos, state)
+
     }
 }
 
@@ -125,8 +125,8 @@ fun NodeVisitor.visitAt(previous: SpellPart<*>, world: World, pos: BlockPos, dir
     if(world.isAir(pos))return null
 
     val blockEntity=world.getBlockEntity(pos)
-    if(blockEntity is NodeBlockEntity){
-        val part=blockEntity.node
+    if(blockEntity is PartBlockEntity){
+        val part=blockEntity.part
         print(part?.name?.string)
         val visited=NodeBlockVisited(world,pos,direction)
         part?.let { visit(visited,it) }
