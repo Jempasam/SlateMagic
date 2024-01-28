@@ -12,10 +12,12 @@ import slabmagic.particle.MagicParticleEffect
 import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
 import slabmagic.spell.effect.SpellEffect
+import slabmagic.spell.spellDesc
+import slabmagic.spell.spellName
 
-class ExplosionSpellEffect(val power: Float=1f): SpellEffect {
+class ExplosionSpellEffect(val power: Float=1f, val createFire: Boolean=false): SpellEffect {
     override fun use(context: SpellContext): SpellContext {
-        context.world.createExplosion(null, context.pos.x, context.pos.y, context.pos.z, 1.0f+power*context.power.toFloat()/2, false, Explosion.DestructionType.DESTROY)
+        context.world.createExplosion(null, context.pos.x, context.pos.y, context.pos.z, 1.0f+power*context.power.toFloat()/2, createFire, Explosion.DestructionType.DESTROY)
         val ppower=context.power/10.0
         sendParticleEffect(
             context.world,
@@ -28,13 +30,13 @@ class ExplosionSpellEffect(val power: Float=1f): SpellEffect {
         return context
     }
 
-    override val name: Text get() = Text.of("Explosion")
+    override val name: Text get() = spellName( if(createFire) "fire_explosion" else "explosion" )
 
-    override val description: Text get() = Text.of("create an explosion")
+    override val description: Text get() = spellDesc( if(createFire) "fire_explosion" else "explosion", power)
 
-    override val cost: Int get() = 20
+    override val cost: Int get() = (20*power).toInt()
 
-    override val color: Vec3f get() = ColorTools.vec(DyeColor.ORANGE.signColor)
+    override val color: Vec3f get() = ColorTools.vec(if(createFire) DyeColor.ORANGE.signColor else DyeColor.RED.signColor)
 
     override val shape: SpellShape get() = SpellShape(Array(4){SpellShape.Circle(16, 20, 0, 0, 1, 40, 8)})
 

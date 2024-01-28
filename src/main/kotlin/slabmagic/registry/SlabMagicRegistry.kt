@@ -6,10 +6,10 @@ import net.minecraft.util.registry.Registry
 import net.minecraft.util.registry.RegistryKey
 import net.minecraft.util.registry.SimpleRegistry
 import slabmagic.SlabMagicMod
-import slabmagic.spell.build.parts.AssembledSpell
+import slabmagic.spell.build.AssembledSpell
 import slabmagic.spell.build.parts.SlabMagicSpellParts
 import slabmagic.spell.build.parts.SpellPart
-import slabmagic.spell.build.parts.assembleSpell
+import slabmagic.spell.build.assembleSpell
 
 object SlabMagicRegistry {
 
@@ -59,7 +59,7 @@ object SlabMagicRegistry {
 
     /* STATICS */
     private fun <T>key(id: String): RegistryKey<Registry<T>>{
-        return RegistryKey.ofRegistry(SlabMagicMod.id(id));
+        return RegistryKey.ofRegistry(SlabMagicMod.id(id))
     }
 
     private fun <T> registry(key: RegistryKey<Registry<T>>): SimpleRegistry<T>{

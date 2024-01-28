@@ -8,7 +8,7 @@ import net.minecraft.util.collection.DefaultedList
 import net.minecraft.util.math.Vec3d
 import slabmagic.helper.ColorTools
 import slabmagic.registry.SlabMagicRegistry
-import slabmagic.spell.build.parts.AssembledSpell
+import slabmagic.spell.build.AssembledSpell
 
 interface SpellItem {
     fun getSpell(stack: ItemStack) = stack.nbt ?.get("spell") ?.let{ AssembledSpell.fromNbt(it) } ?: AssembledSpell.STUB

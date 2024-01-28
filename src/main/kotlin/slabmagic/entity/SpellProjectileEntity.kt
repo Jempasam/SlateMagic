@@ -15,7 +15,7 @@ import slabmagic.entity.data.SpellEntity
 import slabmagic.entity.tracked.SlabMagicTrackedData
 import slabmagic.particle.MagicParticleEffect
 import slabmagic.spell.SpellContext
-import slabmagic.spell.build.parts.AssembledSpell
+import slabmagic.spell.build.AssembledSpell
 
 class SpellProjectileEntity : ThrownEntity, SpellEntity {
 

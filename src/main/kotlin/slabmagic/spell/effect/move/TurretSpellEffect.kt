@@ -10,15 +10,16 @@ import slabmagic.network.messages.sendParticleEffect
 import slabmagic.particle.MagicParticleEffect
 import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
-import slabmagic.spell.build.parts.AssembledSpell
+import slabmagic.spell.build.AssembledSpell
 import slabmagic.spell.effect.SpellEffect
+import slabmagic.spell.times
 import kotlin.math.sqrt
 
-class TurretSpellEffect(val cadency: Int, val count: Int, val decorated: AssembledSpell): SpellEffect {
+class TurretSpellEffect(val cadency: Int, val count: Int, val decorated: AssembledSpell, val endSpell: AssembledSpell?=null): SpellEffect {
 
-    override fun use(context: SpellContext): SpellContext? {
+    override fun use(context: SpellContext): SpellContext {
         val levelCount= (count*sqrt(context.power.toDouble())).toInt()
-        val trap=SpellTurretEntity(SlabMagicEntities.SPELL_TURRET, context.world, decorated, context.power, cadency, levelCount)
+        val trap=SpellTurretEntity(SlabMagicEntities.SPELL_TURRET, context.world, decorated, context.power, cadency, levelCount, endSpell)
         trap.setPosition(context.pos)
         trap.pitch=context.direction.x
         trap.yaw=context.direction.y
@@ -34,14 +35,14 @@ class TurretSpellEffect(val cadency: Int, val count: Int, val decorated: Assembl
     }
 
     override val name: Text get() {
-        if(count==1)return Text.of("Delayed ").also { it.siblings.add(decorated.effect.name) }
-        else return Text.of("Turret of ").also { it.siblings.add(decorated.effect.name) }
+        return if(count==1) Text.literal("Delayed ").append(decorated.effect.name)
+        else Text.literal("Turret of ").append(decorated.effect.name)
     }
 
-    override val description: Text get(){
-        if(count==1)return Text.of("after some time ").also { it.siblings.add(decorated.effect.description) }
-        else return Text.of("summon a turret that, $count times, ").also { it.siblings.add(decorated.effect.description) }
-    }
+    override val description: Text get() =
+        if(count==1) Text.literal("after some time ").append((endSpell?:decorated).effect.description)
+        else if(endSpell==null) Text.literal("summon a turret that").times(count).append(decorated.effect.description)
+        else Text.literal("summon a turret that").times(count-1).append(decorated.effect.description).append(" then ").append(endSpell.effect.description)
 
     override val cost: Int get() = decorated.effect.cost*count
 

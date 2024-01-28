@@ -8,6 +8,8 @@ import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
 import slabmagic.spell.effect.SpellEffect
 import slabmagic.spell.pierce
+import slabmagic.spell.spellDesc
+import slabmagic.spell.spellName
 
 class BreakSpellEffect(val strength: Float): SpellEffect {
 
@@ -23,9 +25,8 @@ class BreakSpellEffect(val strength: Float): SpellEffect {
         return null
     }
 
-    override val name: Text get() = Text.of("Break")
-
-    override val description: Text get() = Text.of("break with a strength of $strength")
+    override val name: Text get() = spellName("break")
+    override val description: Text get() = spellDesc("break",strength)
 
     override val cost: Int get() = 1+strength.toInt()*3
 

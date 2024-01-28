@@ -79,7 +79,7 @@ object SlabMagicClientNetwork {
     private inline fun particleHandler(crossinline function: AdvancedParticleMessage.(World)->Unit): PlayChannelHandler{
         return PlayChannelHandler { client, handler, buf, _ ->
             val message=AdvancedParticleMessage(buf)
-            if(message.world == handler.world.registryKey){
+            if(message.world == handler.world?.registryKey){
                 client.execute{ message.function(handler.world) }
             }
         }

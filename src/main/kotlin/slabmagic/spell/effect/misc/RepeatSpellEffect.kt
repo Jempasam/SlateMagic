@@ -11,9 +11,9 @@ import slabmagic.spell.SpellContext
 import slabmagic.spell.effect.SpellEffect
 
 class RepeatSpellEffect(val decorated: SpellEffect, val count: Int) : SpellEffect{
-    override val description: Text get() = Text.of("${count} times, ").also { it.siblings.add(decorated.description) }
+    override val description: Text get() = Text.literal("$count times, ").apply { append(decorated.description) }
 
-    override val name: Text get() = Text.of("Multi ").also { it.siblings.add(decorated.name) }
+    override val name: Text get() = Text.literal("Multi ").apply { append(decorated.name) }
 
     override val cost: Int get() = decorated.cost*count
 

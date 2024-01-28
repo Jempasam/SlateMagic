@@ -1,38 +1,36 @@
 package slabmagic.spell.effect.action
 
 import net.minecraft.block.Block
-import net.minecraft.text.Text
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Vec3d
 import net.minecraft.util.math.Vec3f
 import slabmagic.helper.ColorTools
+import slabmagic.network.messages.sendParticleEffect
+import slabmagic.particle.EnergyBlockParticleEffect
 import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
 import slabmagic.spell.effect.SpellEffect
 import slabmagic.spell.pierce
+import slabmagic.spell.spellDescIt
+import slabmagic.spell.spellName
 
 class BlockReplaceSpellEffect(val replaced: Set<Block>, val block: Block): SpellEffect {
 
-    override fun use(context: SpellContext): SpellContext? {
-        val bpos=BlockPos(context.pos)
+    override fun use(context: SpellContext): SpellContext {
         pierce(context)
-        if(replaced.contains(context.world.getBlockState(bpos).block))
+        val bpos=BlockPos(context.pos)
+        if(replaced.contains(context.world.getBlockState(bpos).block)){
             context.world.setBlockState(bpos,block.defaultState)
+            val color=color
+            sendParticleEffect(context.world, EnergyBlockParticleEffect(color,color,0.5f), Vec3d.ofCenter(bpos))
+        }
+
         return context
     }
 
-    override val name: Text get() = block.name.apply { siblings.add(Text.of(" Transmutation")) }
+    override val name get() = spellName("block_replace", block.name)
 
-    override val description: Text get(){
-        val ret=Text.literal("replace ")
-        for(r in replaced)ret.siblings.apply {
-            add(r.name)
-            add(Text.literal(", "))
-        }
-        ret.siblings.removeLast()
-        ret.siblings.add(Text.literal(" with "))
-        ret.siblings.add(block.name)
-        return ret
-    }
+    override val description get() = spellDescIt("block_replace", replaced, block.name){ arrayOf(it.name) }
 
     override val cost: Int get() = 5
 

@@ -24,7 +24,7 @@ abstract class JsonLoader<T>(val id: Identifier, val dir: String): SimpleResourc
                     val obj=JsonHelper.deserialize(InputStreamReader(res.value.inputStream))
                     ret.add(res.key to deserialize(obj))
                 }catch (e: Exception){
-                    SlabMagicMod.warn("For ressource \"$id\" in \"$dir\", in file \"${res.key}\": "+e.message);
+                    SlabMagicMod.warn("For ressource \"$id\" in \"$dir\", in file \"${res.key}\": "+e.message)
                 }
             }
             ret

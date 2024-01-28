@@ -7,34 +7,13 @@ import net.minecraft.state.StateManager
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.World
-import slabmagic.block.entity.visitAt
-import slabmagic.helper.ColorTools
-import slabmagic.spell.build.parts.AssembledSpell
+import slabmagic.block.properties.visitAt
+import slabmagic.item.WandItem
 import slabmagic.spell.build.parts.SPELL
-import slabmagic.spell.build.visitor.AssemblingNodeVisitor
-import slabmagic.spell.build.visitor.Visited
+import slabmagic.spell.build.visitor.AssemblingPartVisitor
 import slabmagic.spell.build.visitor.VisitorException
 
-class ConcentratorBlock(val action: Action, settings: Settings): Block(settings) {
-
-    fun interface Action{
-        fun apply(visited: Visited, spell: AssembledSpell, power: Int)
-    }
-
-    companion object{
-        fun castPower(visited: Visited, spell: AssembledSpell, power: Int){
-            visited.cast(spell.effect,power)
-        }
-
-        fun cast(visited: Visited, spell: AssembledSpell, power: Int){
-            visited.cast(spell.effect,1)
-        }
-
-        fun show(visited: Visited, spell: AssembledSpell, power: Int){
-            visited.show(spell.effect.shape,ColorTools.int(spell.effect.color))
-        }
-    }
-
+class ConcentratorBlock(val action: WandItem.Action, settings: Settings): Block(settings) {
     init {
         defaultState=defaultState.with(TRIGGERED,false)
     }
@@ -59,17 +38,17 @@ class ConcentratorBlock(val action: Action, settings: Settings): Block(settings)
                     for (direction in Direction.entries) {
                         val next_pos = pos.offset(direction)
 
-                        val visitor= AssemblingNodeVisitor()
+                        val visitor= AssemblingPartVisitor()
                         try{
-                            visitor.visitAt(world,next_pos,direction)
-                        }catch (e: VisitorException){ }
+                            val visited= visitor.visitAt(world,next_pos,direction)
 
-                        val result=visitor.result
-                        val visited=visitor.lastVisited
-                        if(result!=null && visited!=null && result.first.type==SPELL){
-                            val spell=SPELL.get(result.first)
-                            action.apply(visited,spell,power)
-                        }
+                            val result=visitor.result
+                            if(result!=null && result.first.type==SPELL){
+                                val spell=SPELL.get(result.first)
+                                action.apply(visited, null, spell, power)
+                            }
+
+                        }catch (_: VisitorException){}
                     }
                     world.setBlockState(pos,state.with(TRIGGERED,true))
                 }

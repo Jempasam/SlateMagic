@@ -43,7 +43,7 @@ class SpellCastingWeaponItem(settings: Settings) : SwordItem(MATERIAL, 3, -2.4f,
         val spell=getSpellName(stack)
         val color=getColor(stack)
         val power=getPower(stack)
-        tooltip.add(Text.literal(spell+" "+power).setStyle(Style.EMPTY.withColor(color)))
+        tooltip.add(Text.literal("$spell $power").setStyle(Style.EMPTY.withColor(color)))
         super.appendTooltip(stack, world, tooltip, context)
     }
 

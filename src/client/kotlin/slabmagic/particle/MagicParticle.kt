@@ -47,13 +47,12 @@ class MagicParticle(
     override fun tick() {
         super.tick()
         prevAngle=angle
-        if(maxAge-age<20){
+        angle += if(maxAge-age<20){
             scale((maxAge-age)/20f)
             //angle+=1.1f-(maxAge-age)/20f
-            angle+=0.1f
-        }
-        else{
-            angle+=0.1f
+            0.1f
+        } else{
+            0.1f
         }
     }
 }

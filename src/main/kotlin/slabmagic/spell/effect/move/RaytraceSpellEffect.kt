@@ -14,11 +14,11 @@ import slabmagic.spell.effect.SpellEffect
 
 class RaytraceSpellEffect(val maxDistance: Int, val decorated: SpellEffect): SpellEffect {
 
-    override fun use(context: SpellContext): SpellContext? {
+    override fun use(context: SpellContext): SpellContext {
         val original=context.pos
         val actual=Vector3d(context.pos.x, context.pos.y, context.pos.z)
-        val directionVector=Vec3d.fromPolar(context.direction.x,context.direction.y)
-        val leveledMaxDistance= (maxDistance*(1.0+0.5*context.power)).toInt()
+        val directionVector=Vec3d.fromPolar(context.direction.x,context.direction.y).multiply(0.333)
+        val leveledMaxDistance= (maxDistance*(1.0+0.5*context.power)).toInt()*3
         for(i in 0..<leveledMaxDistance){
             val blockpos=BlockPos(actual.x,actual.y,actual.z)
             if(!context.world.getBlockState(blockpos).isAir){
@@ -46,9 +46,9 @@ class RaytraceSpellEffect(val maxDistance: Int, val decorated: SpellEffect): Spe
         return context
     }
 
-    override val name: Text get() = Text.of("Air ").also { it.siblings.add(decorated.name) }
+    override val name: Text get() = Text.literal("Air ").append(decorated.name)
 
-    override val description: Text get() = Text.of("from a distance of $maxDistance, ").also { it.siblings.add(decorated.description) }
+    override val description: Text get() = Text.literal("from a distance of $maxDistance, ").append(decorated.description)
 
     override val cost: Int get() = (decorated.cost*(1.0+maxDistance/10.0)).toInt()
 

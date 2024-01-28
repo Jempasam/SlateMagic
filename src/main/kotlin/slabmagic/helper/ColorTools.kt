@@ -41,9 +41,12 @@ object ColorTools {
         )
     }
 
+    fun ofHash(obj: Any) = obj.hashCode()%0xffffff
+
     fun of(block: Block): Int {
         return when (block.defaultState.material) {
             Material.FIRE -> DyeColor.RED.fireworkColor
+            Material.PORTAL -> DyeColor.PURPLE.fireworkColor
             else -> block.defaultState.material.color.color
         }
     }
@@ -113,7 +116,7 @@ object ColorTools {
 
                     ?: (item as? DyeItem)?.color?.signColor
                     ?: DyeColor.ORANGE.fireworkColor.takeIf { item.isFireproof }
-                    ?: DyeColor.LIGHT_GRAY.fireworkColor
+                    ?: ofHash(item.translationKey)
         }
     }
 

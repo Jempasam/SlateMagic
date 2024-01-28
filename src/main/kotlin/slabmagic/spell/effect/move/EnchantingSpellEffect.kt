@@ -10,17 +10,18 @@ import slabmagic.network.messages.sendParticleEffect
 import slabmagic.particle.MagicParticleEffect
 import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
-import slabmagic.spell.build.parts.AssembledSpell
+import slabmagic.spell.build.AssembledSpell
 import slabmagic.spell.effect.SpellEffect
+import slabmagic.spell.times
 import kotlin.math.cbrt
 import kotlin.math.sqrt
 
-class EnchantingSpellEffect(val range: Float, val count: Int, val decorated: AssembledSpell): SpellEffect {
+class EnchantingSpellEffect(val range: Float, val count: Int, val decorated: AssembledSpell, val endSpell: AssembledSpell?=null): SpellEffect {
 
-    override fun use(context: SpellContext): SpellContext? {
+    override fun use(context: SpellContext): SpellContext {
         val levelRange=range* cbrt(context.power.toFloat())
         val levelCount= count* sqrt(context.power.toDouble()).toInt()
-        val trap=SpellEnchantingEntity(SlabMagicEntities.SPELL_ENCHANTING, context.world, decorated, context.power, levelRange, levelCount)
+        val trap=SpellEnchantingEntity(SlabMagicEntities.SPELL_ENCHANTING, context.world, decorated, context.power, levelRange, levelCount, endSpell)
         trap.setPosition(context.pos)
         trap.pitch=context.direction.x
         trap.yaw=context.direction.y
@@ -35,9 +36,11 @@ class EnchantingSpellEffect(val range: Float, val count: Int, val decorated: Ass
         return SpellContext.at(trap,context.power)
     }
 
-    override val name: Text get() = Text.of("Aura of ").also { it.siblings.add(decorated.effect.name) }
+    override val name: Text get() = Text.literal("Aura of ").append(decorated.effect.name)
 
-    override val description: Text get() = Text.of("summon a enchanting targeting an entity $range that on attack, $count times, ").also { it.siblings.add(decorated.effect.description) }
+    override val description: Text get() =
+        if(endSpell==null) Text.literal("enchant an entity that on attack").times(count).append(decorated.effect.description)
+        else Text.literal("enchant an entity that on attack").times(count).append(decorated.effect.description).append(" or ").append(endSpell.effect.description).append(" for the last hit.")
 
     override val cost: Int get() = (decorated.effect.cost*(1.0+range/2.0)*count).toInt()
 

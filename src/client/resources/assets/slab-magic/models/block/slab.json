@@ -1,8 +1,0 @@
-{
-  "parent": "slab-magic:block/totem",
-  "textures": {
-    "up": "slab-magic:block/slab/simple",
-	"down": "slab-magic:block/slab/simple",
-	"side": "slab-magic:block/slab/simple"
-  }
-}

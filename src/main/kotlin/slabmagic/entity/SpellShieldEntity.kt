@@ -6,11 +6,13 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
+import slabmagic.helper.asAngle
+import slabmagic.helper.minus
 import slabmagic.network.messages.AdvancedParticleMessage
 import slabmagic.network.messages.sendParticleEffect
 import slabmagic.particle.MagicParticleEffect
 import slabmagic.spell.SpellContext
-import slabmagic.spell.build.parts.AssembledSpell
+import slabmagic.spell.build.AssembledSpell
 
 class SpellShieldEntity : SpellFollowingEntity{
 
@@ -18,23 +20,32 @@ class SpellShieldEntity : SpellFollowingEntity{
 
     constructor(type: EntityType<*>, world: World) : super(type, world)
 
-    constructor(type: EntityType<*>, world: World, spell: AssembledSpell, power: Int, range: Float, remainingShoot: Int)
-            : super(type, world, spell, power, range)
+    constructor(type: EntityType<*>, world: World, spell: AssembledSpell, power: Int, range: Float, remainingShoot: Int, endSpell: AssembledSpell?=null)
+            : super(type, world, listOfNotNull(spell,endSpell), power, range)
     {
         this.range = range
         this.remainingshoot = remainingShoot
     }
 
     override fun tickTarget(target: Entity) {
-        if(target is LivingEntity){
+
+        if(!world.isClient && target is LivingEntity){
             val range=range.toDouble()
             val attacker=target.attacker
-            println("lastAttackedTime: ${target.lastAttackTime}/${target.age}")
             if(target.lastAttackedTime==target.age-1)target.age--
             if(target.lastAttackedTime==target.age && attacker!=null){
                 target.age+=2
-                val context= SpellContext.at(attacker,power)
+
+                // Pos and direction
+                val mih= range/2.0
+                val direction= (attacker.eyePos-target.eyePos).asAngle()
+
+                // Context
+                val context= SpellContext.atEye(target,power)
+                context.direction=direction
                 context.markeds.addAll(markeds)
+
+                val spell=if(spells.size>1 && remainingshoot==1) spells[1].effect else spells[0].effect
                 spell.use(context)
                 sendParticleEffect(context.world,
                     MagicParticleEffect(spell.color, 0.5f),

@@ -7,7 +7,9 @@ import net.minecraft.particle.ParticleEffect
 import net.minecraft.particle.ParticleType
 import net.minecraft.util.math.Vec3f
 
-class EnergyBlockParticleEffect(val colorFrom: Vec3f, val colorTo: Vec3f, val size: Float): ParticleEffect {
+class EnergyBlockParticleEffect(private val type: ParticleType<out EnergyBlockParticleEffect>, val colorFrom: Vec3f, val colorTo: Vec3f, val size: Float): ParticleEffect {
+
+    constructor(colorFrom: Vec3f, colorTo: Vec3f, size: Float): this(SlabMagicParticles.CUBE, colorFrom, colorTo, size)
 
     override fun write(buf: PacketByteBuf) {
         buf.writeFloat(this.colorFrom.x)
@@ -23,7 +25,12 @@ class EnergyBlockParticleEffect(val colorFrom: Vec3f, val colorTo: Vec3f, val si
 
     override fun asString(): String = "EnergyBlock $colorFrom->$colorTo ($size)"
 
-    override fun getType(): ParticleType<*> = SlabMagicParticles.ENERGY_BLOCK
+    override fun getType() = type
+
+    companion object{
+        inline fun of(colorFrom: Vec3f, colorTo: Vec3f, size: Float, type: SlabMagicParticles.()->ParticleType<out EnergyBlockParticleEffect>)
+                = EnergyBlockParticleEffect(SlabMagicParticles.type(), colorFrom, colorTo, size)
+    }
 
     object Factory: ParticleEffect.Factory<EnergyBlockParticleEffect> {
         override fun read(type: ParticleType<EnergyBlockParticleEffect>, reader: StringReader): EnergyBlockParticleEffect {
@@ -31,11 +38,11 @@ class EnergyBlockParticleEffect(val colorFrom: Vec3f, val colorTo: Vec3f, val si
             val toColor = AbstractDustParticleEffect.readColor(reader)
             reader.expect(' ')
             val f = reader.readFloat()
-            return EnergyBlockParticleEffect(fromColor, toColor, f)
+            return EnergyBlockParticleEffect(type,fromColor, toColor, f)
         }
 
         override fun read(type: ParticleType<EnergyBlockParticleEffect>, buf: PacketByteBuf): EnergyBlockParticleEffect {
-            return EnergyBlockParticleEffect(AbstractDustParticleEffect.readColor(buf), AbstractDustParticleEffect.readColor(buf), buf.readFloat())
+            return EnergyBlockParticleEffect(type, AbstractDustParticleEffect.readColor(buf), AbstractDustParticleEffect.readColor(buf), buf.readFloat())
         }
 
     }

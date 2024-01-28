@@ -9,11 +9,13 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
 
+
 /**
  * Helper object for advanced particle effects
  * @author Jempasam
  */
 object AdvancedParticle {
+
 
     /**
      * Spawn a particle at a position
@@ -98,7 +100,7 @@ object AdvancedParticle {
         val distance=from.distanceTo(to).toInt()*2
         var actual= Vector3d(from.x, from.y, from.z)
         for(i in 0..distance){
-            var advancement=i.toDouble()/distance
+            val advancement=i.toDouble()/distance
             val updown= (1-abs(advancement*2f-1f)-1).let { 1-it*it }
             var pos=from.lerp(to, advancement)
             pos=pos.add(
@@ -302,8 +304,8 @@ object AdvancedParticle {
         val startAngle=Random.nextFloat()*Math.PI*2
         for (i in 1 .. count) {
             val angle = startAngle + anglePerParticle*i
-            val cos=Math.cos(angle)
-            val sin=Math.sin(angle)
+            val cos= cos(angle)
+            val sin= sin(angle)
             val pos = Vec3d(
                 center.x + xPerParticle * i * cos,
                 center.y + yPerParticle * i,

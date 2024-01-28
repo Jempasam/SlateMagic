@@ -76,10 +76,6 @@ class SpellSphereParticle(
 
     }
 
-    override fun tick() {
-        super.tick()
-    }
-
     class Factory(val sprite: SpriteProvider): ParticleFactory<SpellCircleParticleEffect>{
         override fun createParticle(effect: SpellCircleParticleEffect, world: ClientWorld, x: Double, y: Double, z: Double, vx: Double, vy: Double, vz: Double): SpellSphereParticle {
             return SpellSphereParticle(sprite, world, x, y, z, vx, vy, vz, effect)

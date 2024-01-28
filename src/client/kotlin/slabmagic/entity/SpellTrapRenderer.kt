@@ -21,9 +21,9 @@ class SpellTrapRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<Spe
     override fun render(entity: SpellTrapEntity, yaw: Float, tickDelta: Float, matrix: MatrixStack, vertexConsumers: VertexConsumerProvider, i: Int) {
         val spell=entity.spell
 
-        val x = MathHelper.lerp(tickDelta.toDouble(), entity.lastRenderX, entity.getX())
-        val y = MathHelper.lerp(tickDelta.toDouble(), entity.lastRenderY, entity.getY())
-        val z = MathHelper.lerp(tickDelta.toDouble(), entity.lastRenderZ, entity.getZ())
+        val x = MathHelper.lerp(tickDelta.toDouble(), entity.lastRenderX, entity.x)
+        val y = MathHelper.lerp(tickDelta.toDouble(), entity.lastRenderY, entity.y)
+        val z = MathHelper.lerp(tickDelta.toDouble(), entity.lastRenderZ, entity.z)
         val range = entity.range
 
         matrix.push()

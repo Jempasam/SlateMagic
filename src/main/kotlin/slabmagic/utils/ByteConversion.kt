@@ -20,8 +20,8 @@ object ByteConversion {
      * @exception ParseException
      */
     fun parse(c: Char): Byte{
-        if('0' <= c && c <='9')return (c-'0').toByte()
-        else if('a' <= c && c <= 'f')return (c-'a'+10).toByte()
+        return if(c in '0'..'9') (c-'0').toByte()
+        else if(c in 'a'..'f') (c-'a'+10).toByte()
         else throw ParseException("Invalid hexadecimal character '$c'", 0)
     }
 
@@ -40,9 +40,9 @@ object ByteConversion {
 
 
     fun serialize(c: Byte): Char{
-        require(c>=0 && c<=15)
-        if(0<=c && c<=9)return '0'+c.toInt()
-        else return 'a'+c.toInt()-10
+        require(c in 0..15)
+        return if(c in 0..9) '0'+c.toInt()
+        else 'a'+c.toInt()-10
     }
 
     fun serializePair(byte: Byte): String{

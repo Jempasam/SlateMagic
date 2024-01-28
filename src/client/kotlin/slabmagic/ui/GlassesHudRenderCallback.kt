@@ -18,6 +18,7 @@ object GlassesHudRenderCallback: HudRenderCallback {
     private val providers= mutableMapOf<Block,MutableList<Provider>>()
     private var targetedPos= BlockPos.ZERO
     private var targetedBlock= Blocks.AIR
+    private var targetTime= 0L
     private var menu: List<Part> = listOf()
 
     fun register(block: Block, provider: Provider){
@@ -33,12 +34,14 @@ object GlassesHudRenderCallback: HudRenderCallback {
             val looked= player.raycast(6.0, tickDelta, false)
             val bpos=BlockPos(looked.pos.add(player.rotationVector.multiply(0.1)))
             val state= player.world.getBlockState(bpos)
+            val time=System.currentTimeMillis()
             if(state.isAir)return
 
             // Update Menu
-            if(bpos!=targetedPos || state.block!=targetedBlock){
+            if(bpos!=targetedPos || state.block!=targetedBlock || time-targetTime>1000){
                 targetedPos=bpos
                 targetedBlock=state.block
+                targetTime=time
                 val newmenu= mutableListOf<Part>()
                 val block= state.block
                 val provider= providers[block]
@@ -70,7 +73,11 @@ object GlassesHudRenderCallback: HudRenderCallback {
     }
 
     init{
-        register(SlabMagicBlocks.SLAB, GlassesHudProvider)
+        register(SlabMagicBlocks.SLAB, SlabHudProvider)
+        register(SlabMagicBlocks.OLD_SLAB, SlabHudProvider)
+        register(SlabMagicBlocks.COPPER_BATTERY, BatteryHudProvider)
+        register(SlabMagicBlocks.GOLD_BATTERY, BatteryHudProvider)
+        register(SlabMagicBlocks.IRON_BATTERY, BatteryHudProvider)
     }
 
     data class Part(val stack: ItemStack, val text: Text)

@@ -12,7 +12,7 @@ import slabmagic.io.serialization.EncoderTarget
 
 // Registry
 fun <Y,T> EncoderTarget<T>.createReg(obj: Y, reg: Registry<Y>): T{
-    val id= reg.getId(obj) ?: throw Exception(obj.toString()+" is not registred");
+    val id= reg.getId(obj) ?: throw Exception(obj.toString()+" is not registred")
     return create(id.toString())
 }
 

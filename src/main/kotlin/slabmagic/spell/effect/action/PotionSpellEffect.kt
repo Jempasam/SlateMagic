@@ -5,7 +5,6 @@ import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.effect.StatusEffect
 import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.text.Text
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.math.Vec3f
 import slabmagic.helper.ColorTools
@@ -15,16 +14,20 @@ import slabmagic.particle.MagicParticleEffect
 import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
 import slabmagic.spell.effect.SpellEffect
+import slabmagic.spell.spellDesc
+import slabmagic.spell.spellName
 import kotlin.math.sqrt
 
-class PotionSpellEffect(val effect: StatusEffect): SpellEffect {
+class PotionSpellEffect(val effect: StatusEffect, val duration: Int, val amplifier: Int): SpellEffect {
 
     override fun use(context: SpellContext): SpellContext? {
         val spawned=AreaEffectCloudEntity(EntityType.AREA_EFFECT_CLOUD, context.world)
         val living=context.entity
-        if(living is LivingEntity){
+        return if(living is LivingEntity){
             val powerSqrt= sqrt(context.power.toDouble())
-            living.addStatusEffect(StatusEffectInstance(effect, (30*powerSqrt*2).toInt(), (powerSqrt/2).toInt()))
+            val leveledDuration=(duration*powerSqrt).toInt()
+            val leveledAmplifier=((amplifier+1)*powerSqrt).toInt()-1
+            living.addStatusEffect(StatusEffectInstance(effect, duration, amplifier))
             sendParticleEffect(
                 context.world,
                 MagicParticleEffect(color, 0.5f),
@@ -33,16 +36,15 @@ class PotionSpellEffect(val effect: StatusEffect): SpellEffect {
                 Vec3d(1.5,1.5,1.5),
                 40.0+10.0*context.power
             )
-            return context
-        }
-        else return null
+            context
+        } else null
     }
 
-    override val name: Text get() = effect.name
+    override val name get() = spellName("give_potion",effect.name)
 
-    override val description: Text get() = Text.of("inflict an effect of ").apply { siblings.add(effect.name) }
+    override val description get() = spellDesc("give_potion", duration/20.0, effect.name, amplifier+1)
 
-    override val cost: Int get() = 10
+    override val cost: Int get() = duration*(amplifier+1)/10
 
     override val color: Vec3f get() = ColorTools.vec(ColorTools.of(effect))
 
@@ -50,7 +52,7 @@ class PotionSpellEffect(val effect: StatusEffect): SpellEffect {
         Array(4) {SpellShape.Circle(3, 0, 0, 0, 1, 0, 0)}
         .also {
             it[0]= SpellShape.Circle(16, 0, 0, 0, 1, 0, 0)
-            it[2].spacing=60
+            it[2].spacing=(60+duration/5).toByte()
             it[3]= SpellShape.Circle(16, 0, 0, 0, 2, 0, 0)
         }
     )

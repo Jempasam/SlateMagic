@@ -12,7 +12,7 @@ import slabmagic.spell.effect.SpellEffect
 
 class PierceSpellEffect(val decorated: SpellEffect): SpellEffect by decorated {
 
-    override fun use(context: SpellContext): SpellContext? {
+    override fun use(context: SpellContext): SpellContext {
         val original=context.pos
         val actual=Vector3d(context.pos.x, context.pos.y, context.pos.z)
         val directionVector=Vec3d.fromPolar(context.direction.x,context.direction.y).multiply(0.2)
@@ -40,8 +40,8 @@ class PierceSpellEffect(val decorated: SpellEffect): SpellEffect by decorated {
         return context
     }
 
-    override val name: Text get() = Text.of("Intra-").also { it.siblings.add(decorated.name) }
+    override val name: Text get() = Text.literal("Intra-").apply { append(decorated.name) }
 
-    override val description: Text get() = Text.of("in block, ").also { it.siblings.add(decorated.description) }
+    override val description: Text get() = Text.literal("in block, ").apply { append(decorated.description) }
 
 }

@@ -1,6 +1,0 @@
-{
-  "parent": "slab-magic:block/contaminated",
-  "textures": {
-    "all": "slab-magic:block/redstone_eye_triggered"
-  }
-}

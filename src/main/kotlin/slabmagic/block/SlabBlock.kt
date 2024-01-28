@@ -9,10 +9,13 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.BlockView
 import slabmagic.block.entity.PartBlockEntity
+import slabmagic.block.properties.VisitableBlock
 import slabmagic.item.NodeBlockItem
 import slabmagic.item.SlabMagicItems
+import slabmagic.spell.build.visited.SlabPartVisited
+import slabmagic.spell.build.visitor.PartVisitor
 
-class SlabBlock(val factory: FabricBlockEntityTypeBuilder.Factory<out PartBlockEntity>, settings: Settings) : Block(settings), BlockEntityProvider {
+open class SlabBlock(val factory: FabricBlockEntityTypeBuilder.Factory<out PartBlockEntity>, settings: Settings) : Block(settings), BlockEntityProvider, VisitableBlock {
     override fun createBlockEntity(pos: BlockPos, state: BlockState) = factory.create(pos, state)
 
     override fun getPickStack(world: BlockView, pos: BlockPos, state: BlockState): ItemStack {
@@ -32,6 +35,14 @@ class SlabBlock(val factory: FabricBlockEntityTypeBuilder.Factory<out PartBlockE
                 be.part?.let { node -> SlabMagicItems.SLAB.setNode(stack,node) }
             }
         }
+    }
+
+    override fun visit(visitor: PartVisitor, visited: SlabPartVisited): SlabPartVisited {
+        val bentity=visited.block.world.getBlockEntity(visited.block.pos)
+        if(bentity is PartBlockEntity){
+            bentity.part?.let { visitor.visit(visited,it) }
+        }
+        return visited
     }
 
 }

@@ -1,0 +1,51 @@
+package slabmagic.block
+
+import net.minecraft.block.Block
+import net.minecraft.block.Blocks
+import net.minecraft.server.world.ServerWorld
+import net.minecraft.util.math.Vec3d
+import net.minecraft.util.math.Vec3f
+import slabmagic.block.properties.VisitableBlock
+import slabmagic.network.messages.sendParticleEffect
+import slabmagic.network.messages.sendSimpleParticleEffect
+import slabmagic.particle.EnergyBlockParticleEffect
+import slabmagic.particle.MagicParticleEffect
+import slabmagic.particle.SlabMagicParticles
+import slabmagic.spell.build.visited.SlabPartVisited
+import slabmagic.spell.build.visitor.PartVisitor
+
+class ConsumableBatteryBlock(settings: Settings, val power: Int, val color: Vec3f) : Block(settings), VisitableBlock {
+
+    override fun visit(visitor: PartVisitor, visited: SlabPartVisited): SlabPartVisited {
+        val world=visited.block.world
+        val pos=visited.block.pos
+        val state=world.getBlockState(pos)
+
+        val oldc=visited.consumer
+        return visited.copy(
+            energy=visited.energy+power,
+            consumer = {
+                oldc()
+                if(world is ServerWorld){
+                    sendParticleEffect(
+                        world,
+                        EnergyBlockParticleEffect(
+                            SlabMagicParticles.CUBE_ELECTRIC,
+                            color.apply { add(.3f,.3f,.3f); clamp(0f,1f) },
+                            color,
+                            0.5f
+                        ),
+                        Vec3d.ofCenter(visited.block.pos)
+                    )
+                    sendSimpleParticleEffect(
+                        world,
+                        MagicParticleEffect(color,0.5f),
+                        Vec3d.ofCenter(visited.block.pos),
+                        speed = 0.5, count = 5
+                    )
+                    world.setBlockState(pos, Blocks.AIR.defaultState)
+                }
+            }
+        )
+    }
+}

@@ -24,11 +24,11 @@ class RegistryArgumentType<T>(val registry: Registry<T>, val baseNamespace: Stri
     @Throws(CommandSyntaxException::class)
     override fun parse(reader: StringReader): T {
         // Identifier str
-        val i: Int = reader.getCursor()
+        val i: Int = reader.cursor
         while (reader.canRead() && Identifier.isCharValid(reader.peek())) {
             reader.skip()
         }
-        var string: String = reader.getString().substring(i, reader.getCursor())
+        var string: String = reader.string.substring(i, reader.cursor)
         if(!string.contains(':'))string="$baseNamespace:$string"
 
         // Identifier
@@ -58,7 +58,12 @@ class RegistryArgumentType<T>(val registry: Registry<T>, val baseNamespace: Stri
 
         private val EXAMPLES: Collection<String> = mutableListOf("slab-magic:fireball", "slab-magic:iceball")
 
-        val DOES_NOT_EXIST = DynamicCommandExceptionType({Text.translatable("commands.hexlink.registry.unexisting",it)})
+        val DOES_NOT_EXIST = DynamicCommandExceptionType {
+            Text.translatable(
+                "commands.hexlink.registry.unexisting",
+                it
+            )
+        }
 
     }
 

@@ -14,6 +14,8 @@ import slabmagic.particle.MagicParticleEffect
 import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
 import slabmagic.spell.effect.SpellEffect
+import slabmagic.spell.spellDesc
+import slabmagic.spell.spellName
 import kotlin.math.min
 
 class DamageSpellEffect(val damage: Int): SpellEffect {
@@ -21,7 +23,7 @@ class DamageSpellEffect(val damage: Int): SpellEffect {
     override fun use(context: SpellContext): SpellContext? {
         val spawned=AreaEffectCloudEntity(EntityType.AREA_EFFECT_CLOUD, context.world)
         val living=context.entity
-        if(living is LivingEntity){
+        return if(living is LivingEntity){
             living.damage(DamageSource.MAGIC, damage.toFloat())
             sendParticleEffect(
                 context.world,
@@ -31,14 +33,12 @@ class DamageSpellEffect(val damage: Int): SpellEffect {
                 Vec3d(.2,.2,.2),
                 damage*3.0
             )
-            return context
-        }
-        else return null
+            context
+        } else null
     }
 
-    override val name: Text get() = Text.of("Damage")
-
-    override val description: Text get() = Text.of("inflict $damage damages")
+    override val name: Text get() = spellName("damage")
+    override val description: Text get() = spellDesc("damage",damage)
 
     override val cost: Int get() = 5*damage
 

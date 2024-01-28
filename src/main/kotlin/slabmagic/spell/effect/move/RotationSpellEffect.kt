@@ -45,7 +45,7 @@ class RotationSpellEffect(val minimum: Vec2f, val maximum: Vec2f, val decorated:
     override val cost: Int get() = (decorated.cost*(1.0-maximum.add(minimum.negate()).length()/500.0)).toInt()
 
     override val color: Vec3f get() = decorated.color.apply {
-        val length=-maximum.add(minimum.negate()).length().toFloat()/800f
+        val length=-maximum.add(minimum.negate()).length() /800f
         add(0f,length,length)
         clamp(0f,1f)
     }

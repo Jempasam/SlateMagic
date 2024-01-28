@@ -1,6 +1,9 @@
 package slabmagic.spell.effect.action
 
 import net.minecraft.entity.EntityType
+import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.attribute.DefaultAttributeRegistry
+import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.text.Text
 import net.minecraft.util.math.Vec3f
 import slabmagic.helper.ColorTools
@@ -10,6 +13,8 @@ import slabmagic.particle.SpellCircleParticleEffect
 import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
 import slabmagic.spell.effect.SpellEffect
+import slabmagic.spell.spellDesc
+import slabmagic.spell.spellName
 
 class EntitySpellEffect(val type: EntityType<*>): SpellEffect {
     override fun use(context: SpellContext): SpellContext? {
@@ -23,11 +28,14 @@ class EntitySpellEffect(val type: EntityType<*>): SpellEffect {
         return SpellContext.at(spawned, context.power)
     }
 
-    override val name: Text get() = type.name.copy()
+    override val name: Text get() = spellName("summon_entity",type.name)
+    override val description: Text get() = spellDesc("summon_entity",type.name)
 
-    override val description: Text get() = Text.of("summon a ").apply { siblings.add(type.name) }
 
-    override val cost: Int get() = 10
+    override val cost: Int = (maxHealth*5).toInt()
+
+    private val maxHealth
+        get() = (DefaultAttributeRegistry.get(type as EntityType<out LivingEntity>)?.getBaseValue(EntityAttributes.GENERIC_MAX_HEALTH)) ?: 0.0
 
     override val color: Vec3f get() = ColorTools.vec(ColorTools.of(type))
 

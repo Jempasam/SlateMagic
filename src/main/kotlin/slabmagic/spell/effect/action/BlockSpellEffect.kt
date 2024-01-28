@@ -8,10 +8,12 @@ import slabmagic.helper.ColorTools
 import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
 import slabmagic.spell.effect.SpellEffect
+import slabmagic.spell.spellDesc
+import slabmagic.spell.spellName
 
 class BlockSpellEffect(val block: Block): SpellEffect {
 
-    override fun use(context: SpellContext): SpellContext? {
+    override fun use(context: SpellContext): SpellContext {
         val bpos=BlockPos(context.pos)
         if(context.world.getBlockState(bpos).material.isReplaceable){
             context.world.breakBlock(bpos,true)
@@ -20,9 +22,8 @@ class BlockSpellEffect(val block: Block): SpellEffect {
         return context
     }
 
-    override val name: Text get() = block.name
-
-    override val description: Text get() = Text.of("summon a ").apply { siblings.add(block.name) }
+    override val name: Text get() = spellName("set_block", block.name)
+    override val description: Text get() = spellDesc("set_block", block.name)
 
     override val cost: Int get() = 10
 

@@ -8,15 +8,16 @@ import net.minecraft.network.PacketByteBuf
 import net.minecraft.util.math.Vec3d
 import slabmagic.helper.ColorTools
 import slabmagic.shape.SpellShape
-import slabmagic.spell.build.parts.AssembledSpell
-import slabmagic.spell.effect.SpellEffect
-import slabmagic.spell.effect.StubSpellEffect
+import slabmagic.spell.build.AssembledSpell
+import slabmagic.spell.effect.action.StubSpellEffect
 
 interface SpellEntity {
 
     val spellData: Data
 
-    val spell: SpellEffect get() = assembled.effect
+    val spell get() = assembled.effect
+
+    val spells get() = spellData.spells
 
     var assembled: AssembledSpell
         get() = spellData.spell
@@ -30,15 +31,21 @@ interface SpellEntity {
         get() = spellData.marked
         set(v) { spellData.marked = v }
 
-    class Data(var spell: AssembledSpell, var power: Int, var marked: List<Vec3d>){
+    class Data(var spells: List<AssembledSpell>, var power: Int, var marked: List<Vec3d>){
 
-        constructor(): this(AssembledSpell.STUB, 1, listOf())
+        constructor(): this(listOf(AssembledSpell.STUB), 1, listOf())
+
+        var spell
+            get() = spells[0]
+            set(value){ spells= listOf(value) }
 
         fun read(buf: PacketByteBuf){
             try{
                 power=buf.readInt()
-                val shape=SpellShape(buf.readString())
-                spell= AssembledSpell(listOf(),StubSpellEffect(ColorTools.vec(buf.readInt()), shape))
+                spells= List(buf.readVarInt()){
+                    val shape=SpellShape(buf.readString())
+                    AssembledSpell(listOf(), StubSpellEffect(ColorTools.vec(buf.readInt()), shape))
+                }
             }catch (e: Exception){
                 spell= AssembledSpell.STUB
                 power=1
@@ -47,20 +54,24 @@ interface SpellEntity {
 
         fun write(buf: PacketByteBuf){
             buf.writeInt(power)
-            buf.writeString(spell.effect.shape.toCode())
-            buf.writeInt(ColorTools.int(spell.effect.color))
+            buf.writeVarInt(spells.size)
+            for(s in spells){
+                buf.writeString(s.effect.shape.toCode())
+                buf.writeInt(ColorTools.int(s.effect.color))
+            }
         }
 
         fun read(nbt: NbtCompound){
-            spell=nbt.get("spell") ?.let{ AssembledSpell.fromNbt(it) } ?: AssembledSpell.STUB
-            power=nbt.getInt("power")
-            marked=nbt.getList("markeds", NbtElement.LIST_TYPE.toInt()).map {m ->
+            spells= nbt.getList("spells", NbtElement.LIST_TYPE.toInt())
+                .map { AssembledSpell.fromNbt(it) ?: AssembledSpell.STUB }
+            power= nbt.getInt("power")
+            marked= nbt.getList("markeds", NbtElement.LIST_TYPE.toInt()).map {m ->
                 Vec3d.CODEC.decode(NbtOps.INSTANCE, m).get().orThrow().first
             }
         }
 
         fun write(nbt: NbtCompound){
-            nbt.put("spell", spell.toNbt())
+            nbt.put("spells", NbtList().apply{ addAll(spells.map{it.toNbt()}) })
             nbt.putInt("power", power)
             nbt.put("markeds", NbtList().apply {
                 for(m in marked){

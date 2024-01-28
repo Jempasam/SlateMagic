@@ -15,7 +15,7 @@ import slabmagic.network.messages.sendParticleEffect
 import slabmagic.particle.AdvancedParticle
 import slabmagic.particle.MagicParticleEffect
 import slabmagic.spell.SpellContext
-import slabmagic.spell.build.parts.AssembledSpell
+import slabmagic.spell.build.AssembledSpell
 import kotlin.math.min
 import kotlin.random.Random
 
@@ -36,7 +36,7 @@ class SpellTrapEntity : SimpleSpellEntity{
     constructor(type: EntityType<*>, world: World) : super(type, world)
 
     constructor(type: EntityType<*>, world: World, spell: AssembledSpell, power: Int, range: Float, remainingShoot: Int)
-            : super(type, world, spell, power)
+            : super(type, world, listOf(spell), power)
     {
         this.range = range
         this.remainingshoot = remainingShoot

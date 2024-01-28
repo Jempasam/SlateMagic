@@ -10,19 +10,20 @@ import slabmagic.network.messages.sendParticleEffect
 import slabmagic.particle.MagicParticleEffect
 import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
-import slabmagic.spell.build.parts.AssembledSpell
+import slabmagic.spell.build.AssembledSpell
 import slabmagic.spell.effect.SpellEffect
+import slabmagic.spell.times
 import kotlin.math.cbrt
 import kotlin.math.max
 import kotlin.math.sqrt
 
-class CurseSpellEffect(val range: Float, val count: Int, val cadency: Int, val decorated: AssembledSpell): SpellEffect {
+class CurseSpellEffect(val range: Float, val count: Int, val cadency: Int, val decorated: AssembledSpell, val endSpell: AssembledSpell?=null): SpellEffect {
 
-    override fun use(context: SpellContext): SpellContext? {
+    override fun use(context: SpellContext): SpellContext {
         val levelRange=range* cbrt(context.power.toFloat())
         val levelCount= count* sqrt(context.power.toDouble()).toInt()
         val levelCadency= max(1, (cadency*(1.0f-sqrt(context.power.toDouble())/10f)).toInt())
-        val trap=SpellCurseEntity(SlabMagicEntities.SPELL_CURSE, context.world, decorated, context.power, levelRange, levelCount, levelCadency)
+        val trap=SpellCurseEntity(SlabMagicEntities.SPELL_CURSE, context.world, decorated, context.power, levelRange, levelCount, levelCadency, endSpell)
         trap.setPosition(context.pos)
         trap.pitch=context.direction.x
         trap.yaw=context.direction.y
@@ -37,9 +38,13 @@ class CurseSpellEffect(val range: Float, val count: Int, val cadency: Int, val d
         return SpellContext.at(trap,context.power)
     }
 
-    override val name: Text get() = Text.of("Curse of ").also { it.siblings.add(decorated.effect.name) }
+    override val name: Text get() = Text.literal("Curse of ").append(decorated.effect.name)
 
-    override val description: Text get() = Text.of("summon a curse targeting an entity in a range of $range that, $count times, ").also { it.siblings.add(decorated.effect.description) }
+    override val description: Text get() =
+        if(count==1) Text.literal("cast a curse on an entity that after ${cadency/20f}s, ").append(decorated.effect.description)
+        else if(endSpell==null) Text.literal("cast a curse on an entity that").times(count).append("each ${cadency/20f}s, ").append(decorated.effect.description)
+        else if(count==2) Text.literal("cast a curse on an entity that").append(decorated.effect.description).append(", then after ${cadency/20f}s, ").append(endSpell.effect.description)
+        else Text.literal("cast a curse on an entity that").times(count-1).append("each ${cadency/20f}s, ").append(decorated.effect.description).append(", then after ${cadency/20f}s, ").append(endSpell.effect.description)
 
     override val cost: Int get() = (decorated.effect.cost*(1.0+range/2.0)*count*(1.0f-sqrt(cadency.toDouble())/50)).toInt()
 

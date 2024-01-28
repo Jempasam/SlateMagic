@@ -37,9 +37,9 @@ class ZoneSpellEffect(val zone: Vec3d, val decorated: SpellEffect): SpellEffect 
         return lastContext
     }
 
-    override val name: Text get() = Text.of("Zone ").also { it.siblings.add(decorated.name) }
+    override val name: Text get() = Text.literal("Zone ").append(decorated.name)
 
-    override val description: Text get() = Text.of("in a zone of dimension $zone, ").also { it.siblings.add(decorated.description) }
+    override val description: Text get() = Text.literal("on entities in a zone of dimension ${zone.x}x${zone.y}x${zone.z}, ").append(decorated.description)
 
     override val cost: Int get() = (decorated.cost*(1.0+zone.x*zone.y*zone.z/150.0)).toInt()
 

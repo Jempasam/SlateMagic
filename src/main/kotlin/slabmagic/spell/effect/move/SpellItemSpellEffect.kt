@@ -12,13 +12,13 @@ import slabmagic.network.messages.sendParticleEffect
 import slabmagic.particle.MagicParticleEffect
 import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
-import slabmagic.spell.build.parts.AssembledSpell
+import slabmagic.spell.build.AssembledSpell
 import slabmagic.spell.effect.SpellEffect
 import kotlin.math.max
 
 class SpellItemSpellEffect(val item: Item, val count: Int, val decorated: AssembledSpell): SpellEffect {
 
-    override fun use(context: SpellContext): SpellContext? {
+    override fun use(context: SpellContext): SpellContext {
         val stack=ItemStack(item,count)
         if(item is SpellItem) item.fill(stack, decorated, context.power, context.markeds)
         val dropped=ItemEntity(context.world, context.pos.x, context.pos.y, context.pos.z, stack)
@@ -33,9 +33,9 @@ class SpellItemSpellEffect(val item: Item, val count: Int, val decorated: Assemb
         return context.setEntity(dropped)
     }
 
-    override val name: Text get() = Text.of("Tool of ").also { it.siblings.add(decorated.effect.name) }
+    override val name: Text get() = item.name.copy().append(Text.of(" of ")).append(decorated.effect.name)
 
-    override val description: Text get() = Text.of("give a item that, on use, ").also { it.siblings.add(decorated.effect.description) }
+    override val description: Text get() = Text.literal("give $count ").append(item.name).append(" item that, on use, ").append(decorated.effect.description)
 
     override val cost: Int get() = decorated.effect.cost * count * max(1,item.maxDamage)
 

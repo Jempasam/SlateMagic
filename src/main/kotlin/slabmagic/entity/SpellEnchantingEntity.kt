@@ -10,7 +10,7 @@ import slabmagic.network.messages.AdvancedParticleMessage
 import slabmagic.network.messages.sendParticleEffect
 import slabmagic.particle.MagicParticleEffect
 import slabmagic.spell.SpellContext
-import slabmagic.spell.build.parts.AssembledSpell
+import slabmagic.spell.build.AssembledSpell
 
 class SpellEnchantingEntity : SpellFollowingEntity{
 
@@ -18,21 +18,22 @@ class SpellEnchantingEntity : SpellFollowingEntity{
 
     constructor(type: EntityType<*>, world: World) : super(type, world)
 
-    constructor(type: EntityType<*>, world: World, spell: AssembledSpell, power: Int, range: Float, remainingShoot: Int)
-            : super(type, world, spell, power, range)
+    constructor(type: EntityType<*>, world: World, spell: AssembledSpell, power: Int, range: Float, remainingShoot: Int, endSpell: AssembledSpell?=null)
+            : super(type, world, listOfNotNull(spell,endSpell), power, range)
     {
         this.range = range
         this.remainingshoot = remainingShoot
     }
 
     override fun tickTarget(target: Entity) {
-        if(target is LivingEntity){
+        if(!world.isClient && target is LivingEntity){
             val range=range.toDouble()
             if(target.lastAttackTime==target.age-1)target.age--
             if(target.lastAttackTime==target.age){
                 target.age+=2
                 val context= SpellContext.at(target,power)
                 context.markeds.addAll(markeds)
+                val spell=if(spells.size>1 && remainingshoot==1) spells[1].effect else spells[0].effect
                 spell.use(context)
                 sendParticleEffect(context.world,
                     MagicParticleEffect(spell.color, 0.5f),

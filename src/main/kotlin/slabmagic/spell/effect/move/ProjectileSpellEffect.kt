@@ -10,7 +10,7 @@ import slabmagic.network.messages.sendParticleEffect
 import slabmagic.particle.MagicParticleEffect
 import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
-import slabmagic.spell.build.parts.AssembledSpell
+import slabmagic.spell.build.AssembledSpell
 import slabmagic.spell.effect.SpellEffect
 import kotlin.math.max
 import kotlin.math.sqrt
@@ -18,7 +18,7 @@ import kotlin.math.sqrt
 class ProjectileSpellEffect(val strength: Float, val duration: Int, val decorated: AssembledSpell, val divergence: Float=0f):
     SpellEffect {
 
-    override fun use(context: SpellContext): SpellContext? {
+    override fun use(context: SpellContext): SpellContext {
         val levelDuration= (duration*sqrt(context.power.toDouble())).toInt()
         val levelStrength= (strength*sqrt(context.power.toFloat()))
 
@@ -38,11 +38,11 @@ class ProjectileSpellEffect(val strength: Float, val duration: Int, val decorate
     }
 
     override val name: Text get() {
-        return Text.of("Gun of ").also { it.siblings.add(decorated.effect.name) }
+        return Text.literal("Gun of ").append(decorated.effect.name)
     }
 
     override val description: Text get(){
-        return Text.of("shoot a projectile that ").also { it.siblings.add(decorated.effect.description) }
+        return Text.literal("shoot a projectile that ").append(decorated.effect.description)
     }
 
     override val cost: Int get() = (decorated.effect.cost*(1f+duration/40f+strength/1f)).toInt()

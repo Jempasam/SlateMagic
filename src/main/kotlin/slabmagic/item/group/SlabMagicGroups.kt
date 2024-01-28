@@ -15,6 +15,9 @@ object SlabMagicGroups {
     val MAIN=FabricItemGroupBuilder.create(SlabMagicMod.id("main")).icon(::getSlabIcon).build()
     val TOOLS=ItemSubGroup.create(MAIN, SlabMagicMod.id("tools"))
     val SLABS=ItemSubGroup.create(MAIN, SlabMagicMod.id("slabs"))
+    val OLD_SLABS=ItemSubGroup.create(MAIN, SlabMagicMod.id("old_slabs"))
+    val ENERGY_SLABS=ItemSubGroup.create(MAIN, SlabMagicMod.id("energy_slabs"))
     val SPELLS=ItemSubGroup.create(MAIN, SlabMagicMod.id("spells"))
+    val BUILDINGS=ItemSubGroup.create(MAIN, SlabMagicMod.id("buildings"))
 
 }

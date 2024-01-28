@@ -35,6 +35,10 @@ object SlabMagicEntities {
         dimensions(EntityType.FIREBALL.dimensions)
     }
 
+    val BLOCK_FOLLOWING = register("block_following", ::BlockFollowingEntity){
+        dimensions(EntityType.FIREBALL.dimensions)
+    }
+
 
     fun <T: Entity>register(id: String, factory: EntityFactory<T>, builder: FabricEntityTypeBuilder<T>.()->Unit): EntityType<T> {
         val type=FabricEntityTypeBuilder.create(SpawnGroup.MISC,factory).apply{builder()}.build()

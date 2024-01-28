@@ -16,6 +16,10 @@ repositories {
 		url 'https://repo.sleeping.town'
 		content { includeGroup 'com.unascribed' }
 	}
+	maven {
+		name = "Modrinth"
+		url = "https://api.modrinth.com/maven"
+	}
 }
 
 loom {
@@ -32,6 +36,14 @@ loom {
 		datagen {
 			inherit client
 			name "Data Generation"
+			vmArg "-Dfabric-api.datagen"
+			vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
+			vmArg "-Dfabric-api.datagen.modid=${archives_base_name}"
+			runDir "build/datagen"
+		}
+		datagenClient {
+			inherit client
+			name "Client Data Generation"
 			vmArg "-Dfabric-api.datagen"
 			vmArg "-Dfabric-api.datagen.output-dir=${file("src/client/generated")}"
 			vmArg "-Dfabric-api.datagen.modid=${archives_base_name}"
@@ -50,6 +62,9 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
+
+	modRuntimeOnly "maven.modrinth:1eAoo2KR:2.2.0-for-1.19.2"
+	modRuntimeOnly "maven.modrinth:adaptive-tooltips:1.0.1"
 
 	modApi include("com.unascribed:lib39-core:1.4.2")
 	modApi include("com.unascribed:lib39-fractal:1.4.2")

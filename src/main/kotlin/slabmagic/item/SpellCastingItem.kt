@@ -35,7 +35,7 @@ class SpellCastingItem(settings: Settings) : Item(settings), SpellItem {
         val spell=getSpellName(stack)
         val color=getColor(stack)
         val power=getPower(stack)
-        tooltip.add(Text.literal(spell+" "+power).setStyle(Style.EMPTY.withColor(color)))
+        tooltip.add(Text.literal("$spell $power").setStyle(Style.EMPTY.withColor(color)))
         super.appendTooltip(stack, world, tooltip, context)
     }
 

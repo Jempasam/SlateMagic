@@ -17,7 +17,7 @@ import slabmagic.spell.build.parts.SlabMagicSpellParts
 
 object SlabMagicMod : ModInitializer {
 
-	val MODID="slab-magic"
+	const val MODID="slab-magic"
 
     private val logger = LoggerFactory.getLogger(MODID)
 

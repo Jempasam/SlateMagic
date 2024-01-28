@@ -9,7 +9,7 @@ import slabmagic.network.messages.AdvancedParticleMessage
 import slabmagic.network.messages.sendParticleEffect
 import slabmagic.particle.MagicParticleEffect
 import slabmagic.spell.SpellContext
-import slabmagic.spell.build.parts.AssembledSpell
+import slabmagic.spell.build.AssembledSpell
 
 class SpellTurretEntity : SimpleSpellEntity{
 
@@ -21,8 +21,8 @@ class SpellTurretEntity : SimpleSpellEntity{
 
     constructor(type: EntityType<*>, world: World) : super(type, world)
 
-    constructor(type: EntityType<*>, world: World, spell: AssembledSpell, power: Int, cadency: Int, remainingShoot: Int)
-            : super(type, world, spell, power)
+    constructor(type: EntityType<*>, world: World, spell: AssembledSpell, power: Int, cadency: Int, remainingShoot: Int, spellend: AssembledSpell?=null)
+            : super(type, world, spellend?.let { listOf(spell,spellend) } ?: listOf(spell), power)
     {
         this.cadency = cadency
         this.time = cadency
@@ -40,8 +40,11 @@ class SpellTurretEntity : SimpleSpellEntity{
                 if(remainingShoot<=0) kill()
                 time=cadency
                 remainingShoot--
+                val selectedSpell=
+                    if(remainingShoot==0 && spellData.spells.size==2) spellData.spells[1].effect
+                    else spellData.spells[0].effect
 
-                val color=this.spell.color
+                val color=selectedSpell.color
                 val power=this.power
                 sendParticleEffect(
                     world,
@@ -53,7 +56,7 @@ class SpellTurretEntity : SimpleSpellEntity{
                 )
                 val context=SpellContext.at(this, power)
                 context.markeds.addAll(markeds)
-                spell.use(context)
+                selectedSpell.use(context)
 
                 if(remainingShoot<=0) kill()
             }

@@ -6,10 +6,12 @@ import net.minecraft.entity.data.DataTracker
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.Packet
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket
+import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 import slabmagic.entity.data.SpellEntity
 import slabmagic.entity.tracked.SlabMagicTrackedData
-import slabmagic.spell.build.parts.AssembledSpell
+import slabmagic.spell.build.AssembledSpell
+import kotlin.math.abs
 
 
 open class SimpleSpellEntity(type: EntityType<*>, world: World) : Entity(type, world), SpellEntity {
@@ -20,13 +22,22 @@ open class SimpleSpellEntity(type: EntityType<*>, world: World) : Entity(type, w
     }
 
 
-    constructor(type: EntityType<*>, world: World, spell: AssembledSpell, power: Int) : this(type, world) {
-        spellData.spell=spell
+    constructor(type: EntityType<*>, world: World, spells: List<AssembledSpell>, power: Int) : this(type, world) {
+        spellData.spells=spells
         spellData.power=power
     }
 
 
     final override val spellData get() = dataTracker[SPELL_DATA]
+
+    override fun tick() {
+        super.tick()
+        setPosition(pos.x+velocity.x,pos.y+velocity.y,pos.z+velocity.z)
+        velocity=velocity.multiply(0.3)
+        if(abs(velocity.x) <0.01 && abs(velocity.y) <0.01 && abs(velocity.z) <0.01)velocity= Vec3d.ZERO
+        velocityDirty=true
+        scheduleVelocityUpdate()
+    }
 
     override fun initDataTracker() {
         dataTracker.startTracking(SPELL_DATA, SpellEntity.Data())

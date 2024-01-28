@@ -10,14 +10,14 @@ import slabmagic.network.messages.sendParticleEffect
 import slabmagic.particle.MagicParticleEffect
 import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
-import slabmagic.spell.build.parts.AssembledSpell
+import slabmagic.spell.build.AssembledSpell
 import slabmagic.spell.effect.SpellEffect
 import kotlin.math.cbrt
 import kotlin.math.sqrt
 
 class TrapSpellEffect(val range: Float, val count: Int, val decorated: AssembledSpell): SpellEffect {
 
-    override fun use(context: SpellContext): SpellContext? {
+    override fun use(context: SpellContext): SpellContext {
         val levelRange=range* cbrt(context.power.toFloat())
         val levelCount= count* sqrt(context.power.toDouble()).toInt()
         val trap=SpellTrapEntity(SlabMagicEntities.SPELL_TRAP, context.world, decorated, context.power, levelRange, levelCount)
@@ -35,9 +35,11 @@ class TrapSpellEffect(val range: Float, val count: Int, val decorated: Assembled
         return SpellContext.at(trap,context.power)
     }
 
-    override val name: Text get() = Text.of("Trap of ").also { it.siblings.add(decorated.effect.name) }
+    override val name: Text get() = Text.literal("Trap of ").append(decorated.effect.name)
 
-    override val description: Text get() = Text.of("summon a trap with a range of $range that ").also { it.siblings.add(decorated.effect.description) }
+    override val description: Text get() =
+        if(count==1)Text.literal("summon a trap with a range of $range that ").append(decorated.effect.description)
+        else Text.literal("summon a $count usages trap with a range of $range that ").append(decorated.effect.description)
 
     override val cost: Int get() = (decorated.effect.cost*(1.0+range/2.0)*count).toInt()
 

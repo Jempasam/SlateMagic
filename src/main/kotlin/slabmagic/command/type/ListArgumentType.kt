@@ -51,7 +51,7 @@ class ListArgumentType<T, A: ArgumentType<T>>(val type: A): ArgumentType<List<T>
 
     override fun <S> listSuggestions( context: CommandContext<S>, builder: SuggestionsBuilder ): CompletableFuture<Suggestions> {
         val remaining=builder.remaining
-        if(remaining.length==0){
+        if(remaining.isEmpty()){
             builder.suggest("[")
             return builder.buildFuture()
         }
@@ -61,7 +61,6 @@ class ListArgumentType<T, A: ArgumentType<T>>(val type: A): ArgumentType<List<T>
             return if(lastStart==remaining.length){
                 subbuilder.suggest("]")
                 subbuilder.suggest(",")
-                println(subbuilder.remaining)
                 type.listSuggestions(context,subbuilder)
             }
             else{
@@ -122,7 +121,7 @@ class ListArgumentType<T, A: ArgumentType<T>>(val type: A): ArgumentType<List<T>
         }
 
         fun <T,A:ArgumentType<T>> getProp(type: A): Properties {
-            val serializer=ArgumentTypesAccessor.fabric_getClassMap().get(type.javaClass) as ArgumentSerializer<A,*>
+            val serializer= ArgumentTypesAccessor.fabric_getClassMap()[type.javaClass] as ArgumentSerializer<A,*>
             return Properties(serializer.getArgumentTypeProperties(type))
         }
     }

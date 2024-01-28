@@ -26,7 +26,7 @@ open class SpellCircleParticleEffect(private val type: ParticleType<*>, val shap
     override fun getType(): ParticleType<*> = type
 
     object Factory: ParticleEffect.Factory<SpellCircleParticleEffect> {
-        val UNKNOWN_SPELL=DynamicCommandExceptionType({ Text.of("Unknown spell: $it") })
+        val UNKNOWN_SPELL=DynamicCommandExceptionType { Text.of("Unknown spell: $it") }
 
         override fun read(type: ParticleType<SpellCircleParticleEffect>, reader: StringReader ): SpellCircleParticleEffect {
             reader.expect(' ')

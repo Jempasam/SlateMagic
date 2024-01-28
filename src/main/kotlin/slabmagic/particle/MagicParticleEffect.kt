@@ -7,20 +7,27 @@ import net.minecraft.particle.ParticleEffect
 import net.minecraft.particle.ParticleType
 import net.minecraft.util.math.Vec3f
 
-class MagicParticleEffect(color: Vec3f, size: Float): AbstractDustParticleEffect(color,size) {
+class MagicParticleEffect(private val type: ParticleType<out MagicParticleEffect>, color: Vec3f, size: Float): AbstractDustParticleEffect(color,size) {
 
-    override fun getType(): ParticleType<*> = SlabMagicParticles.MAGIC
+    constructor(color: Vec3f, size: Float): this(SlabMagicParticles.MAGIC, color, size)
+
+    override fun getType() = type
+
+    companion object{
+        inline fun of(color: Vec3f, size: Float, type: SlabMagicParticles.()->ParticleType<out MagicParticleEffect>)
+            = MagicParticleEffect(SlabMagicParticles.type(), color, size)
+    }
 
     object Factory: ParticleEffect.Factory<MagicParticleEffect> {
         override fun read(type: ParticleType<MagicParticleEffect>, reader: StringReader ): MagicParticleEffect {
             val color = readColor(reader)
             reader.expect(' ')
             val f = reader.readFloat()
-            return MagicParticleEffect(color, f)
+            return MagicParticleEffect(type, color, f)
         }
 
         override fun read(type: ParticleType<MagicParticleEffect>, buf: PacketByteBuf ): MagicParticleEffect {
-            return MagicParticleEffect(readColor(buf), buf.readFloat())
+            return MagicParticleEffect(type, readColor(buf), buf.readFloat())
         }
     }
 }

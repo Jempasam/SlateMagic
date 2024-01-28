@@ -7,11 +7,11 @@ import slabmagic.spell.SpellContext
 import slabmagic.spell.effect.SpellEffect
 
 class ForkSpellEffect(val a: SpellEffect, val b: SpellEffect) : SpellEffect{
-    override val description: Text get() = a.description.also { it.siblings.add(Text.of(" and ")); it.siblings.add(b.description) }
+    override val description: Text get() = a.description.copy().append(Text.of(" and ")).append(b.description)
 
-    override val name: Text get() = a.name.also {
-        it.siblings.add(Text.of(" and "))
-        it.siblings.add(b.name)
+    override val name: Text get() = a.name.copy().apply {
+        append(Text.of(" and "))
+        append(b.name)
     }
 
     override val cost: Int get() = a.cost+b.cost

@@ -17,7 +17,7 @@ import net.minecraft.text.Style
 import net.minecraft.text.Text
 import net.minecraft.util.math.Direction
 import slabmagic.SlabMagicMod
-import slabmagic.block.entity.visitAt
+import slabmagic.block.properties.visitAt
 import slabmagic.command.commands.ParticleEffectCommand
 import slabmagic.command.type.ListArgumentType
 import slabmagic.command.type.RegistryArgumentType
@@ -27,11 +27,11 @@ import slabmagic.particle.SpellCircleParticleEffect
 import slabmagic.registry.SlabMagicRegistry
 import slabmagic.shape.painter.GraphicsPainter
 import slabmagic.spell.SpellContext
-import slabmagic.spell.build.parts.AssembledSpell
+import slabmagic.spell.build.AssembledSpell
+import slabmagic.spell.build.assembleSpell
 import slabmagic.spell.build.parts.SpellPart
-import slabmagic.spell.build.parts.assembleSpell
-import slabmagic.spell.build.parts.visitAll
-import slabmagic.spell.build.visitor.AssemblingNodeVisitor
+import slabmagic.spell.build.visitAll
+import slabmagic.spell.build.visitor.AssemblingPartVisitor
 import slabmagic.spell.effect.SpellEffect
 import java.awt.image.BufferedImage
 import java.io.File
@@ -42,8 +42,7 @@ import slabmagic.spell.build.parts.SPELL as SPELL_PART
 object SlabMagicCommands {
 
     fun CommandContext<ServerCommandSource>.getSpell(name: String): SpellEffect {
-        val arg=getArgument("spell", Any::class.java)
-        when (arg) {
+        when (val arg=getArgument("spell", Any::class.java)) {
             is AssembledSpell -> return arg.effect
 
             is List<*> -> {
@@ -58,9 +57,9 @@ object SlabMagicCommands {
             is PosArgument -> {
                 try{
                     val blockpos=arg.toAbsoluteBlockPos(source)
-                    val visitor= AssemblingNodeVisitor()
+                    val visitor= AssemblingPartVisitor()
                     visitor.visitAt(source.world,blockpos,Direction.UP)
-                    return visitor?.result?.first?.let(SPELL_PART::cast)?.effect
+                    return visitor.result?.first?.let(SPELL_PART::cast)?.effect
                         ?: throw CommandException(Text.of("Not a spell"))
                 }
                 catch (e: CommandException){ throw e }
@@ -68,8 +67,7 @@ object SlabMagicCommands {
             }
 
             else ->{
-                println("NOt a spell")
-                throw CommandException(Text.of("Expected spell, got ${arg}"))
+                throw CommandException(Text.of("Expected spell, got $arg"))
             }
         }
     }
@@ -178,10 +176,10 @@ object SlabMagicCommands {
             .executes { context ->
                 val nodes = ListArgumentType.get<SpellPart<*>>(context,"nodes")
                 try{
-                    val visitor=AssemblingNodeVisitor()
+                    val visitor=AssemblingPartVisitor()
                     visitor.visitAll(nodes)
                     val result=visitor.result?.first ?: throw CommandException(Text.of("Invalid node assembling"))
-                    val text = Text.of("${result.type.name}: ${result}")
+                    val text = Text.of("${result.type.name}: $result")
                     context.source.sendMessage(text)
                     1
                 }catch(e:Exception){

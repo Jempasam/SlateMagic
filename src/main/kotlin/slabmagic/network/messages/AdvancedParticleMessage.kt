@@ -78,9 +78,19 @@ class AdvancedParticleMessage(val effect: ParticleEffect, val world: RegistryKey
     }
 }
 
-fun sendParticleEffect(world: ServerWorld, effect: ParticleEffect, pos: Vec3d, id: Identifier= AdvancedParticleMessage.BOX, size: Vec3d=Vec3d(0.1,0.1,0.1), count: Double=1.0, speed: Vec3d=Vec3d.ZERO){
+fun sendParticleEffect(world: ServerWorld, effect: ParticleEffect, pos: Vec3d, id: Identifier= AdvancedParticleMessage.BOX, size: Vec3d=Vec3d(0.02,0.02,0.02), count: Double=1.0, speed: Vec3d=Vec3d.ZERO){
     ServerNetwork.sendToAll(
         world, id,
         AdvancedParticleMessage( effect, world.registryKey, pos, size, speed, count )
+    )
+}
+
+fun sendSimpleParticleEffect(world: ServerWorld, effect: ParticleEffect, pos: Vec3d, id: Identifier= AdvancedParticleMessage.BOX, size: Vec3d=Vec3d(0.02,0.02,0.02), count: Int=1, speed: Double=0.0){
+    world.spawnParticles(
+        effect,
+        pos.x, pos.y, pos.z,
+        count,
+        size.x, size.y, size.z,
+        speed
     )
 }

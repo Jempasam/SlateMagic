@@ -30,7 +30,17 @@ object SlabMagicModClient : ClientModInitializer {
 		HudRenderCallback.EVENT.register(GlassesHudRenderCallback)
 
 		BlockRenderLayerMap.INSTANCE.putBlock(SlabMagicBlocks.SLAB,RenderLayer.getCutout())
-		BlockRenderLayerMap.INSTANCE.putBlock(SlabMagicBlocks.CONTAMINATED_REDSTONE_HEART,RenderLayer.getTranslucent())
+		BlockRenderLayerMap.INSTANCE.putBlock(SlabMagicBlocks.OLD_SLAB,RenderLayer.getCutout())
+		BlockRenderLayerMap.INSTANCE.putBlock(SlabMagicBlocks.ENERGY_SLAB,RenderLayer.getTranslucent())
+		BlockRenderLayerMap.INSTANCE.putBlock(SlabMagicBlocks.ENERGY_BATTERY,RenderLayer.getTranslucent())
+		BlockRenderLayerMap.INSTANCE.putBlock(SlabMagicBlocks.CONTAMINATED_REDSTONE_HEART,RenderLayer.getCutout())
+		BlockRenderLayerMap.INSTANCE.putBlock(SlabMagicBlocks.CONTAMINATED_REDSTONE_EYE,RenderLayer.getCutout())
+
+		SlabMagicBlocks.COPPER_GRATE.forEach{BlockRenderLayerMap.INSTANCE.putBlock(it,RenderLayer.getCutout())}
+		SlabMagicBlocks.COPPER_WINDOW.forEach{BlockRenderLayerMap.INSTANCE.putBlock(it,RenderLayer.getCutout())}
+		SlabMagicBlocks.COPPER_BRICKS.forEach{BlockRenderLayerMap.INSTANCE.putBlock(it,RenderLayer.getCutout())}
+		SlabMagicBlocks.CHISELED_COPPER.forEach{BlockRenderLayerMap.INSTANCE.putBlock(it,RenderLayer.getCutout())}
+		SlabMagicBlocks.METAL_SANDWICH.forEach{BlockRenderLayerMap.INSTANCE.putBlock(it,RenderLayer.getCutout())}
 	}
 
 }

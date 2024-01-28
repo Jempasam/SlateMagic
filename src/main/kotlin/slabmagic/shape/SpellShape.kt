@@ -83,11 +83,9 @@ class SpellShape(private val circles: Array<Circle>) {
         }
     }
 
-    constructor(factory: ()->Circle): this(Array(4){ factory() }) {
-    }
+    constructor(factory: ()->Circle): this(Array(4){ factory() })
 
-    constructor() : this(Array(4){ Circle(10,10,0,0,1,0,0) }) {
-    }
+    constructor() : this(Array(4){ Circle(10,10,0,0,1,0,0) })
 
     operator fun get(index: Int): Circle = circles[index]
 
