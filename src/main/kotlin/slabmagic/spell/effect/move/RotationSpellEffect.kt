@@ -3,10 +3,11 @@ package slabmagic.spell.effect.move
 import net.minecraft.text.Text
 import net.minecraft.util.math.MathHelper.lerp
 import net.minecraft.util.math.Vec2f
-import net.minecraft.util.math.Vec3f
+import org.joml.Vector3f
 import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
 import slabmagic.spell.effect.SpellEffect
+import slabmagic.utils.coerceIn
 import kotlin.random.Random
 
 class RotationSpellEffect(val minimum: Vec2f, val maximum: Vec2f, val decorated: SpellEffect): SpellEffect {
@@ -44,10 +45,10 @@ class RotationSpellEffect(val minimum: Vec2f, val maximum: Vec2f, val decorated:
 
     override val cost: Int get() = (decorated.cost*(1.0-maximum.add(minimum.negate()).length()/500.0)).toInt()
 
-    override val color: Vec3f get() = decorated.color.apply {
+    override val color: Vector3f get() = decorated.color.apply {
         val length=-maximum.add(minimum.negate()).length() /800f
         add(0f,length,length)
-        clamp(0f,1f)
+        coerceIn(0f,1f)
     }
 
     override val shape: SpellShape get() = SpellShape(

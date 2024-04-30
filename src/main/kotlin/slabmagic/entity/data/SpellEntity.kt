@@ -1,15 +1,11 @@
 package slabmagic.entity.data
 
+import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtElement
-import net.minecraft.nbt.NbtList
 import net.minecraft.nbt.NbtOps
-import net.minecraft.network.PacketByteBuf
-import net.minecraft.util.math.Vec3d
-import slabmagic.helper.ColorTools
-import slabmagic.shape.SpellShape
+import slabmagic.spell.SpellContext
 import slabmagic.spell.build.AssembledSpell
-import slabmagic.spell.effect.action.StubSpellEffect
+import kotlin.jvm.optionals.getOrNull
 
 interface SpellEntity {
 
@@ -19,65 +15,33 @@ interface SpellEntity {
 
     val spells get() = spellData.spells
 
-    var assembled: AssembledSpell
-        get() = spellData.spell
-        set(v) { spellData.spell = v }
+    val assembled get() = spellData.spell
 
-    var power: Int
-        get() = spellData.power
-        set(v) { spellData.power = v }
+    val stored get() = spellData.stored
 
-    var markeds: List<Vec3d>
-        get() = spellData.marked
-        set(v) { spellData.marked = v }
+    data class Data(val spells: List<AssembledSpell>, val stored: SpellContext.Stored){
 
-    class Data(var spells: List<AssembledSpell>, var power: Int, var marked: List<Vec3d>){
+        constructor(): this(listOf(AssembledSpell.STUB), SpellContext.Stored.EMPTY)
 
-        constructor(): this(listOf(AssembledSpell.STUB), 1, listOf())
+        val spell get() = spells[0]
 
-        var spell
-            get() = spells[0]
-            set(value){ spells= listOf(value) }
-
-        fun read(buf: PacketByteBuf){
-            try{
-                power=buf.readInt()
-                spells= List(buf.readVarInt()){
-                    val shape=SpellShape(buf.readString())
-                    AssembledSpell(listOf(), StubSpellEffect(ColorTools.vec(buf.readInt()), shape))
-                }
-            }catch (e: Exception){
-                spell= AssembledSpell.STUB
-                power=1
-            }
-        }
-
-        fun write(buf: PacketByteBuf){
-            buf.writeInt(power)
-            buf.writeVarInt(spells.size)
-            for(s in spells){
-                buf.writeString(s.effect.shape.toCode())
-                buf.writeInt(ColorTools.int(s.effect.color))
-            }
-        }
-
-        fun read(nbt: NbtCompound){
-            spells= nbt.getList("spells", NbtElement.LIST_TYPE.toInt())
-                .map { AssembledSpell.fromNbt(it) ?: AssembledSpell.STUB }
-            power= nbt.getInt("power")
-            marked= nbt.getList("markeds", NbtElement.LIST_TYPE.toInt()).map {m ->
-                Vec3d.CODEC.decode(NbtOps.INSTANCE, m).get().orThrow().first
-            }
+        fun read(nbt: NbtCompound): Data?{
+            return CODEC.decode(NbtOps.INSTANCE, nbt.get("spell_data")).result().getOrNull()?.first
         }
 
         fun write(nbt: NbtCompound){
-            nbt.put("spells", NbtList().apply{ addAll(spells.map{it.toNbt()}) })
-            nbt.putInt("power", power)
-            nbt.put("markeds", NbtList().apply {
-                for(m in marked){
-                    add(Vec3d.CODEC.encode(m, NbtOps.INSTANCE, NbtList()).get().orThrow())
-                }
-            })
+            CODEC.encodeStart(NbtOps.INSTANCE, this).ifSuccess { nbt.put("spell_data", it) }
+        }
+
+        companion object{
+            val CODEC= RecordCodecBuilder.create {it :RecordCodecBuilder.Instance<Data> ->
+                it.group(
+                    AssembledSpell.CODEC.listOf() .fieldOf("spells") .forGetter{it.spells},
+                    SpellContext.Stored.CODEC .fieldOf("stored") .forGetter{it.stored},
+                ).apply(it, ::Data)
+            }
+
+            val EMPTY=Data()
         }
     }
 }

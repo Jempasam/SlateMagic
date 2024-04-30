@@ -1,14 +1,18 @@
 package slabmagic.datagen
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
-import net.minecraft.util.registry.Registry
+import net.minecraft.registry.RegistryKeys
+import net.minecraft.registry.RegistryWrapper
 import slabmagic.SlabMagicMod
 import slabmagic.registry.SlabMagicRegistry
 import slabmagic.spell.build.parts.SpellParts
+import java.util.concurrent.CompletableFuture
 import kotlin.reflect.full.hasAnnotation
 
-class SlabMagicLanguageGenerator(gen: FabricDataGenerator): FabricLanguageProvider(gen,"en_us") {
+class SlabMagicLanguageGenerator(gen: FabricDataOutput, reg: CompletableFuture<RegistryWrapper.WrapperLookup>)
+    : FabricLanguageProvider(gen,reg)
+{
 
     class Builder(private val tb: TranslationBuilder){
         private val set=HashSet<String>()
@@ -21,7 +25,7 @@ class SlabMagicLanguageGenerator(gen: FabricDataGenerator): FabricLanguageProvid
         }
     }
 
-    override fun generateTranslations(translationBuilder: TranslationBuilder) {
+    override fun generateTranslations(registries: RegistryWrapper.WrapperLookup, translationBuilder: TranslationBuilder) {
         Builder(translationBuilder).apply {
             val i18n=SlabMagicMod::i18n
 
@@ -88,13 +92,11 @@ class SlabMagicLanguageGenerator(gen: FabricDataGenerator): FabricLanguageProvid
                 put(i18n("itemGroup",id), name)
             }
 
-            tab("main","Slab Magic")
-            tab("spell")
-            tab("tools")
-            tab("slabs")
-            tab("old_slabs")
-            tab("spells")
-            tab("buildings")
+            for(key in registries.getWrapperOrThrow(RegistryKeys.ITEM_GROUP).streamEntries().map{it.registryKey()}){
+                if(key.value.namespace.equals(SlabMagicMod.MODID)){
+                    tab(key.value.path, idToName(key.value.path))
+                }
+            }
 
 
             // Block
@@ -113,7 +115,7 @@ class SlabMagicLanguageGenerator(gen: FabricDataGenerator): FabricLanguageProvid
             block("activator_concentrator","Totem Activator Concentrator")
             block("upgraded_activator_concentrator","Upgraded Totem Activator Concentrator")
 
-            for((key,block) in Registry.BLOCK.entrySet){
+            for(key in registries.getWrapperOrThrow(RegistryKeys.BLOCK).streamEntries().map{it.registryKey()}){
                 if(key.value.namespace.equals(SlabMagicMod.MODID)){
                     block(key.value.path, idToName(key.value.path))
                 }
@@ -135,7 +137,7 @@ class SlabMagicLanguageGenerator(gen: FabricDataGenerator): FabricLanguageProvid
             item("spell_sword","Sword Of %s")
             item("spell_wand","Wand Of %s")
 
-            for((key,item) in Registry.ITEM.entrySet){
+            for(key in registries.getWrapperOrThrow(RegistryKeys.ITEM).streamEntries().map{it.registryKey()}){
                 if(key.value.namespace.equals(SlabMagicMod.MODID)){
                     item(key.value.path, idToName(key.value.path))
                 }

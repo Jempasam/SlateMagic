@@ -4,31 +4,29 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.data.DataTracker
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.network.Packet
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 import slabmagic.entity.data.SpellEntity
 import slabmagic.entity.tracked.SlabMagicTrackedData
-import slabmagic.spell.build.AssembledSpell
+import slabmagic.entity.tracked.provideDelegate
 import kotlin.math.abs
 
 
 open class SimpleSpellEntity(type: EntityType<*>, world: World) : Entity(type, world), SpellEntity {
 
-
     companion object{
         val SPELL_DATA = DataTracker.registerData(SimpleSpellEntity::class.java, SlabMagicTrackedData.SPELL_DATA)
     }
 
-
-    constructor(type: EntityType<*>, world: World, spells: List<AssembledSpell>, power: Int) : this(type, world) {
-        spellData.spells=spells
-        spellData.power=power
+    override fun initDataTracker(builder: DataTracker.Builder) {
+        builder.add(SPELL_DATA, SpellEntity.Data())
     }
 
+    final override var spellData by SPELL_DATA
 
-    final override val spellData get() = dataTracker[SPELL_DATA]
+    constructor(type: EntityType<*>, world: World, data: SpellEntity.Data) : this(type, world) {
+        spellData=data
+    }
 
     override fun tick() {
         super.tick()
@@ -39,10 +37,6 @@ open class SimpleSpellEntity(type: EntityType<*>, world: World) : Entity(type, w
         scheduleVelocityUpdate()
     }
 
-    override fun initDataTracker() {
-        dataTracker.startTracking(SPELL_DATA, SpellEntity.Data())
-    }
-
     override fun readCustomDataFromNbt(nbt: NbtCompound) {
         spellData.read(nbt)
     }
@@ -50,7 +44,5 @@ open class SimpleSpellEntity(type: EntityType<*>, world: World) : Entity(type, w
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
         spellData.write(nbt)
     }
-
-    override fun createSpawnPacket(): Packet<*> = EntitySpawnS2CPacket(this)
 
 }

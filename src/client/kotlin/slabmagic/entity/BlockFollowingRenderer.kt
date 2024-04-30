@@ -24,12 +24,12 @@ class BlockFollowingRenderer(ctx: EntityRendererFactory.Context) : EntityRendere
     override fun render(entity: BlockFollowingEntity, yaw: Float, tickDelta: Float, matrices: MatrixStack, vertexConsumers: VertexConsumerProvider, light: Int) {
         val block = entity.block
         val state = block.defaultState
-        val bpos = BlockPos(entity.pos)
+        val bpos = BlockPos.ofFloored(entity.pos)
         if (state.renderType == BlockRenderType.MODEL) {
-            val world: World = entity.getWorld()
+            val world: World = entity.world
             if (state !== world.getBlockState(entity.blockPos) && state.renderType != BlockRenderType.INVISIBLE) {
                 matrices.push()
-                val blockPos = BlockPos(
+                val blockPos = BlockPos.ofFloored(
                     entity.x,
                     entity.boundingBox.maxY,
                     entity.z

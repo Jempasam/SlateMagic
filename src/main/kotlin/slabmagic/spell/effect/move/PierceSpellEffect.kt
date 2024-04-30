@@ -1,9 +1,9 @@
 package slabmagic.spell.effect.move
 
-import net.minecraft.client.util.math.Vector3d
 import net.minecraft.text.Text
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
+import org.joml.Vector3d
 import slabmagic.network.messages.AdvancedParticleMessage
 import slabmagic.network.messages.sendParticleEffect
 import slabmagic.particle.MagicParticleEffect
@@ -18,7 +18,7 @@ class PierceSpellEffect(val decorated: SpellEffect): SpellEffect by decorated {
         val directionVector=Vec3d.fromPolar(context.direction.x,context.direction.y).multiply(0.2)
         val leveledMaxDistance= 20
         for(i in 0..<leveledMaxDistance){
-            val blockpos=BlockPos(actual.x,actual.y,actual.z)
+            val blockpos=BlockPos.ofFloored(actual.x,actual.y,actual.z)
             if(!context.world.getBlockState(blockpos).isAir){
                 break
             }
@@ -30,7 +30,7 @@ class PierceSpellEffect(val decorated: SpellEffect): SpellEffect by decorated {
             context.world,
             MagicParticleEffect(color, 0.3f),
             original,
-            AdvancedParticleMessage.BOOM,
+            AdvancedParticleMessage.Shape.BOOM,
             Vec3d(0.1,0.1,0.1),
             6.0,
             speed=directionVector.negate()

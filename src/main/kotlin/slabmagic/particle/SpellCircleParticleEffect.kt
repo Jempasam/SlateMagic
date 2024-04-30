@@ -1,11 +1,11 @@
 package slabmagic.particle
 
-import com.mojang.brigadier.StringReader
-import com.mojang.brigadier.exceptions.DynamicCommandExceptionType
-import net.minecraft.network.PacketByteBuf
+import com.mojang.serialization.Codec
+import com.mojang.serialization.codecs.RecordCodecBuilder
+import net.minecraft.network.codec.PacketCodec
+import net.minecraft.network.codec.PacketCodecs
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.particle.ParticleType
-import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import slabmagic.helper.ColorTools
 import slabmagic.registry.SlabMagicRegistry
@@ -14,44 +14,9 @@ import slabmagic.spell.effect.SpellEffect
 
 open class SpellCircleParticleEffect(private val type: ParticleType<*>, val shape: SpellShape, val color: Int, val size: Float, val duration: Int=100): ParticleEffect {
 
-    override fun write(buf: PacketByteBuf) {
-        buf.writeString(shape.toCode())
-        buf.writeInt(color)
-        buf.writeFloat(size)
-        buf.writeInt(duration)
-    }
+    override fun toString() = shape.toCode()
 
-    override fun asString(): String = shape.toCode()
-
-    override fun getType(): ParticleType<*> = type
-
-    object Factory: ParticleEffect.Factory<SpellCircleParticleEffect> {
-        val UNKNOWN_SPELL=DynamicCommandExceptionType { Text.of("Unknown spell: $it") }
-
-        override fun read(type: ParticleType<SpellCircleParticleEffect>, reader: StringReader ): SpellCircleParticleEffect {
-            reader.expect(' ')
-            val str=reader.readString()
-
-            val (shape,color)=try{
-                SpellShape(str) to reader.readInt()
-            }catch (e: Exception){
-                val id=Identifier.tryParse(str) ?: throw UNKNOWN_SPELL.create(str)
-                val spell=SlabMagicRegistry.EFFECTS.get(id)?.effect ?: throw UNKNOWN_SPELL.create(str)
-                spell.shape to ColorTools.int(spell.color)
-            }
-
-            reader.expect(' ')
-            val size=reader.readFloat()
-            reader.expect(' ')
-            val duration=reader.readInt()
-
-            return SpellCircleParticleEffect(type, shape, color, size, duration)
-        }
-
-        override fun read(type: ParticleType<SpellCircleParticleEffect>, buf: PacketByteBuf ): SpellCircleParticleEffect {
-            return SpellCircleParticleEffect(type, SpellShape(buf.readString()),buf.readInt(), buf.readFloat(), buf.readInt())
-        }
-    }
+    override fun getType() = type
 
     companion object{
         fun circle(spell: SpellEffect, size: Float=1.0f, duration: Int=200)
@@ -62,5 +27,33 @@ open class SpellCircleParticleEffect(private val type: ParticleType<*>, val shap
 
         fun sphere(spell: SpellEffect, size: Float=1.0f, duration: Int=200)
                 = SpellCircleParticleEffect(SlabMagicParticles.SPELL_SPHERE, spell.shape, ColorTools.int(spell.color), size, duration)
+
+        fun ofStr(str: String): SpellShape{
+            return try{
+                val id=Identifier(str)
+                val spell=SlabMagicRegistry.EFFECTS.get(id)?.effect ?: throw Exception()
+                spell.shape
+            }catch (e: Exception){
+                SpellShape(str)
+            }
+        }
+
+        fun codecFor(type: ParticleType<out SpellCircleParticleEffect>)
+            = RecordCodecBuilder.mapCodec { it :RecordCodecBuilder.Instance<SpellCircleParticleEffect> ->
+                it.group(
+                    Codec.STRING.xmap({ofStr(it)},{it.toCode()}) .fieldOf("shape").forGetter { it.shape },
+                    Codec.INT .fieldOf("color") .forGetter { it.color },
+                    Codec.FLOAT .optionalFieldOf("size",1f) .forGetter { it.size },
+                    Codec.INT .optionalFieldOf("duration",100) .forGetter { it.duration },
+                ).apply(it){ a,b,c,d -> SpellCircleParticleEffect(type, a,b,c,d)}
+            }
+
+        fun packetCodecFor(type: ParticleType<out SpellCircleParticleEffect>) = PacketCodec.tuple(
+            PacketCodecs.STRING.xmap({SpellShape(it)},{it.toCode()}), { it.shape },
+            PacketCodecs.INTEGER, { it.color },
+            PacketCodecs.FLOAT, { it.size },
+            PacketCodecs.INTEGER, { it.duration },
+            { a,b,c,d -> SpellCircleParticleEffect(type, a,b,c,d)}
+        )
     }
 }

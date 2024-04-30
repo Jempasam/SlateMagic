@@ -1,23 +1,31 @@
 package slabmagic.datagen
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks
-import net.minecraft.data.client.*
+import net.minecraft.data.client.BlockStateModelGenerator
+import net.minecraft.data.client.ItemModelGenerator
+import net.minecraft.data.client.Model
+import net.minecraft.data.client.Models
 import net.minecraft.data.client.TextureKey.*
+import net.minecraft.data.client.VariantSettings.Rotation.*
 import net.minecraft.item.BlockItem
 import net.minecraft.item.Item
-import net.minecraft.util.registry.Registry
+import net.minecraft.registry.Registries
+import net.minecraft.util.math.Direction
 import slabmagic.SlabMagicMod
+import slabmagic.block.FACING
 import slabmagic.block.LEVEL
 import slabmagic.block.SlabMagicBlocks
 import slabmagic.block.TRIGGERED
 import slabmagic.datagen.tools.SamModelGenerator
 import slabmagic.item.SlabMagicItems
+import slabmagic.models.*
 import java.util.*
+import net.minecraft.data.client.TexturedModel as Textured
 
-class SlabMagicModelGenerator(dataGenerator: FabricDataGenerator) : FabricModelProvider(dataGenerator){
+class SlabMagicModelGenerator(dataGenerator: FabricDataOutput) : FabricModelProvider(dataGenerator){
 
 
     override fun generateBlockStateModels(blockStateModelGenerator: BlockStateModelGenerator) {
@@ -35,7 +43,7 @@ class SlabMagicModelGenerator(dataGenerator: FabricDataGenerator) : FabricModelP
                         block,
                         TRIGGERED,
                         tAll(Models.CUBE_ALL, texid(block,"_triggered")),
-                        TexturedModel.CUBE_ALL
+                        Textured.CUBE_ALL
                     )
                     registerOnBool(contaminated, TRIGGERED,
                         tAll(CONTAMINATED_CUBE_ALL, texid(block,"_triggered")),
@@ -52,7 +60,7 @@ class SlabMagicModelGenerator(dataGenerator: FabricDataGenerator) : FabricModelP
                         block,
                         TRIGGERED,
                         tAll(Models.CUBE_ALL, texid(block,"_triggered")),
-                        TexturedModel.CUBE_ALL
+                        Textured.CUBE_ALL
                     )
                 }
 
@@ -110,6 +118,37 @@ class SlabMagicModelGenerator(dataGenerator: FabricDataGenerator) : FabricModelP
                 registerTotem(SlabMagicBlocks.OLD_SLAB, "cursed")
                 registerTotem(SlabMagicBlocks.ENERGY_SLAB, "magic")
 
+                // Robot
+                val ROBOT= Models.CUBE with textures(
+                    PARTICLE to "block/robot/%1_front",
+                    UP to "block/robot/%1_top", DOWN to "block/robot/%1_top",
+                    NORTH to "block/robot/%1_front", SOUTH to "block/robot/%1_side",
+                    EAST to "block/robot/%1_side", WEST to "block/robot/%1_side"
+                )
+                val POWERED_ROBOT= Models.CUBE with textures(
+                    PARTICLE to "block/robot/%1_front",
+                    UP to "block/robot/%1_top_powered", DOWN to "block/robot/%1_top_powered",
+                    NORTH to "block/robot/%1_front_powered", SOUTH to "block/robot/%1_side",
+                    EAST to "block/robot/%1_side", WEST to "block/robot/%1_side"
+                )
+                val ROBOT_STATE= blockState(FACING, TRIGGERED,
+                    (Direction.NORTH to false) to variant("block/%n", Y to R0),
+                    (Direction.EAST to false) to variant("block/%n", Y to R90),
+                    (Direction.SOUTH to false) to variant("block/%n", Y to R180),
+                    (Direction.WEST to false) to variant("block/%n", Y to R270),
+                    (Direction.NORTH to true) to variant("block/%n_powered", Y to R0),
+                    (Direction.EAST to true) to variant("block/%n_powered", Y to R90),
+                    (Direction.SOUTH to true) to variant("block/%n_powered", Y to R180),
+                    (Direction.WEST to true) to variant("block/%n_powered", Y to R270),
+                )
+                fun registerRobot(block: Block){
+                    upload(block,ROBOT,"")
+                    upload(block,POWERED_ROBOT,"_powered")
+                    upload(block,ROBOT_STATE)
+                }
+                registerRobot(SlabMagicBlocks.COPPER_ROBOT)
+                registerRobot(SlabMagicBlocks.GOLD_ROBOT)
+                registerRobot(SlabMagicBlocks.ANCIENT_ROBOT)
             }
         }
     }
@@ -119,13 +158,13 @@ class SlabMagicModelGenerator(dataGenerator: FabricDataGenerator) : FabricModelP
             fun child(item: Item, parent: String) = register(item,modelChild(item,parent))
 
             // Generated
-            fun generated(item: Item) = register(item,Models.GENERATED)
+            fun generated(item: Item) = register(item, Models.GENERATED)
             generated(SlabMagicItems.LENS)
             generated(SlabMagicItems.SPELL_DUST)
             generated(SlabMagicItems.SPELL_ORB)
 
             // Handheld
-            fun handheld(item: Item) = register(item,Models.HANDHELD)
+            fun handheld(item: Item) = register(item, Models.HANDHELD)
             handheld(SlabMagicItems.ACTIVATOR_WAND)
             handheld(SlabMagicItems.ULTRA_WAND)
             handheld(SlabMagicItems.COST_WAND)
@@ -133,10 +172,9 @@ class SlabMagicModelGenerator(dataGenerator: FabricDataGenerator) : FabricModelP
 
             handheld(SlabMagicItems.SPELL_SWORD)
             handheld(SlabMagicItems.SPELL_WAND)
-            handheld(SlabMagicItems.COMMAND_WAND)
 
             // Block Item
-            fun block(item: BlockItem, suffix: String="") = child(item,Registry.BLOCK.getId(item.block).path+suffix)
+            fun block(item: BlockItem, suffix: String="") = child(item,Registries.BLOCK.getId(item.block).path+suffix)
 
             block(SlabMagicItems.SLAB)
             block(SlabMagicItems.OLD_SLAB)
@@ -154,6 +192,10 @@ class SlabMagicModelGenerator(dataGenerator: FabricDataGenerator) : FabricModelP
             block(SlabMagicItems.ACTIVATOR_CONCENTRATOR)
             block(SlabMagicItems.UPGRADED_ACTIVATOR_CONCENTRATOR)
             block(SlabMagicItems.CONDUCTOR)
+
+            block(SlabMagicItems.COPPER_ROBOT)
+            block(SlabMagicItems.GOLD_ROBOT)
+            block(SlabMagicItems.ANCIENT_ROBOT)
 
             SlabMagicItems.COPPER_GRATE.forEach { block(it) }
             SlabMagicItems.COPPER_WINDOW.forEach { block(it) }

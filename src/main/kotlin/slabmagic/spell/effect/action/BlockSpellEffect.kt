@@ -3,7 +3,7 @@ package slabmagic.spell.effect.action
 import net.minecraft.block.Block
 import net.minecraft.text.Text
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Vec3f
+import org.joml.Vector3f
 import slabmagic.helper.ColorTools
 import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
@@ -14,8 +14,8 @@ import slabmagic.spell.spellName
 class BlockSpellEffect(val block: Block): SpellEffect {
 
     override fun use(context: SpellContext): SpellContext {
-        val bpos=BlockPos(context.pos)
-        if(context.world.getBlockState(bpos).material.isReplaceable){
+        val bpos=BlockPos.ofFloored(context.pos)
+        if(context.world.getBlockState(bpos).isReplaceable){
             context.world.breakBlock(bpos,true)
             context.world.setBlockState(bpos,block.defaultState)
         }
@@ -27,7 +27,7 @@ class BlockSpellEffect(val block: Block): SpellEffect {
 
     override val cost: Int get() = 10
 
-    override val color: Vec3f get() = ColorTools.vec(ColorTools.of(block))
+    override val color: Vector3f get() = ColorTools.vec(ColorTools.of(block))
 
     override val shape: SpellShape get() = SpellShape(
         Array(4) {SpellShape.Circle(8, 0, 0, 50, 1, 0, 0)}

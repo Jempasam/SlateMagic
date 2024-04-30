@@ -1,10 +1,10 @@
 package slabmagic.spell
 
-import net.minecraft.client.util.math.Vector3d
 import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
+import org.joml.Vector3d
 import slabmagic.SlabMagicMod
 import kotlin.math.max
 import kotlin.math.min
@@ -17,12 +17,12 @@ fun Byte.converge(value: Byte, strength: Float): Byte {
 }
 
 fun pierce(context: SpellContext){
-    if(!context.world.isAir(BlockPos(context.pos)))return
+    if(!context.world.isAir(BlockPos.ofFloored(context.pos)))return
 
     val actual= Vector3d(context.pos.x, context.pos.y, context.pos.z)
     val directionVector= Vec3d.fromPolar(context.direction.x,context.direction.y).multiply(0.05)
     for(i in 0..<15){
-        val blockpos= BlockPos(actual.x,actual.y,actual.z)
+        val blockpos= BlockPos.ofFloored(actual.x,actual.y,actual.z)
         if(!context.world.isAir(blockpos)){
             break
         }
@@ -39,7 +39,7 @@ fun MutableText.times(count: Int)=
 
 fun spellDesc(id: String, vararg objs: Any) = translatable("spell", "$id.desc", *objs)
 fun <T> spellDescIt(id: String, ite: Iterable<T>, vararg objs: Any, opt: (T)->Array<Text>): MutableText{
-    var ret=Text.empty()
+    val ret=Text.empty()
     val it=ite.iterator()
     var v=it.next()
     while(it.hasNext()){

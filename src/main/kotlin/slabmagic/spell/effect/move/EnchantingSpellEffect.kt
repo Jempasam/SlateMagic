@@ -2,7 +2,7 @@ package slabmagic.spell.effect.move
 
 import net.minecraft.text.Text
 import net.minecraft.util.math.Vec3d
-import net.minecraft.util.math.Vec3f
+import org.joml.Vector3f
 import slabmagic.entity.SlabMagicEntities
 import slabmagic.entity.SpellEnchantingEntity
 import slabmagic.network.messages.AdvancedParticleMessage
@@ -13,15 +13,16 @@ import slabmagic.spell.SpellContext
 import slabmagic.spell.build.AssembledSpell
 import slabmagic.spell.effect.SpellEffect
 import slabmagic.spell.times
+import slabmagic.utils.coerceIn
 import kotlin.math.cbrt
 import kotlin.math.sqrt
 
 class EnchantingSpellEffect(val range: Float, val count: Int, val decorated: AssembledSpell, val endSpell: AssembledSpell?=null): SpellEffect {
 
     override fun use(context: SpellContext): SpellContext {
-        val levelRange=range* cbrt(context.power.toFloat())
-        val levelCount= count* sqrt(context.power.toDouble()).toInt()
-        val trap=SpellEnchantingEntity(SlabMagicEntities.SPELL_ENCHANTING, context.world, decorated, context.power, levelRange, levelCount, endSpell)
+        val levelRange=range* cbrt(context.stored.power.toFloat())
+        val levelCount= count* sqrt(context.stored.power.toDouble()).toInt()
+        val trap=SpellEnchantingEntity(SlabMagicEntities.SPELL_ENCHANTING, context.world, decorated, context.stored, levelRange, levelCount, endSpell)
         trap.setPosition(context.pos)
         trap.pitch=context.direction.x
         trap.yaw=context.direction.y
@@ -29,11 +30,11 @@ class EnchantingSpellEffect(val range: Float, val count: Int, val decorated: Ass
         sendParticleEffect(context.world,
             MagicParticleEffect(color, 0.5f),
             context.pos,
-            AdvancedParticleMessage.SHOCKWAVE,
+            AdvancedParticleMessage.Shape.SHOCKWAVE,
             Vec3d(1.0,0.0,1.0),
             15.0*range
         )
-        return SpellContext.at(trap,context.power)
+        return SpellContext.at(trap,context.stored)
     }
 
     override val name: Text get() = Text.literal("Aura of ").append(decorated.effect.name)
@@ -44,9 +45,9 @@ class EnchantingSpellEffect(val range: Float, val count: Int, val decorated: Ass
 
     override val cost: Int get() = (decorated.effect.cost*(1.0+range/2.0)*count).toInt()
 
-    override val color: Vec3f get() = decorated.effect.color.apply {
+    override val color: Vector3f get() = decorated.effect.color.apply {
         add(-0.1f,0.0f,-0.05f)
-        clamp(0.0f,1.0f)
+        coerceIn(0.0f,1.0f)
     }
 
     override val shape: SpellShape get() = decorated.effect.shape.also {

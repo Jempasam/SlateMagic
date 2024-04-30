@@ -1,15 +1,15 @@
 package slabmagic.registry
 
 import com.mojang.serialization.Lifecycle
-import net.minecraft.util.registry.MutableRegistry
-import net.minecraft.util.registry.Registry
-import net.minecraft.util.registry.RegistryKey
-import net.minecraft.util.registry.SimpleRegistry
+import net.minecraft.registry.*
+import net.minecraft.registry.entry.RegistryEntry
+import net.minecraft.registry.entry.RegistryEntryInfo
 import slabmagic.SlabMagicMod
 import slabmagic.spell.build.AssembledSpell
+import slabmagic.spell.build.assembleSpell
 import slabmagic.spell.build.parts.SlabMagicSpellParts
 import slabmagic.spell.build.parts.SpellPart
-import slabmagic.spell.build.assembleSpell
+import java.util.*
 
 object SlabMagicRegistry {
 
@@ -22,8 +22,8 @@ object SlabMagicRegistry {
 
 
     init{
-        fun spell(id: String, vararg parts: SpellPart<*>){
-            Registry.register(EFFECTS, SlabMagicMod.id(id), listOf(*parts).assembleSpell())
+        fun spell(id: String, vararg parts: RegistryEntry<SpellPart<*>>){
+            Registry.register(EFFECTS, SlabMagicMod.id(id), listOf(*parts).map{it.value()}.assembleSpell())
         }
 
         SlabMagicSpellParts.apply {
@@ -63,13 +63,13 @@ object SlabMagicRegistry {
     }
 
     private fun <T> registry(key: RegistryKey<Registry<T>>): SimpleRegistry<T>{
-        val reg=SimpleRegistry(key, Lifecycle.stable(), null)
-        (Registry.REGISTRIES as MutableRegistry<in Any>).add(key, reg, Lifecycle.stable())
+        val reg=SimpleRegistry(key, Lifecycle.stable())
+        (Registries.REGISTRIES as MutableRegistry<Registry<T>>).add(key, reg, RegistryEntryInfo(Optional.empty(),Lifecycle.stable()))
         return reg
     }
 
     private fun <T> dynamicRegistry(key: RegistryKey<Registry<T>>): SimpleRegistry<T>{
-        val reg=SimpleRegistry(key, Lifecycle.stable(), null)
+        val reg=SimpleRegistry(key, Lifecycle.stable())
         Registry.register(DYNAMICS, key.value, reg)
         return reg
     }

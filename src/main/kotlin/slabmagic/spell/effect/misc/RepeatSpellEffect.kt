@@ -1,7 +1,7 @@
 package slabmagic.spell.effect.misc
 
 import net.minecraft.text.Text
-import net.minecraft.util.math.Vec3f
+import org.joml.Vector3f
 import slabmagic.helper.ColorTools
 import slabmagic.network.messages.sendParticleEffect
 import slabmagic.particle.SlabMagicParticles
@@ -17,7 +17,7 @@ class RepeatSpellEffect(val decorated: SpellEffect, val count: Int) : SpellEffec
 
     override val cost: Int get() = decorated.cost*count
 
-    override val color: Vec3f = decorated.color
+    override val color: Vector3f = decorated.color
 
     override val shape: SpellShape get() = decorated.shape.apply {
         this[0].subCircleCount= (this[0].subCircleCount+1).toByte()

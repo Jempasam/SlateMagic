@@ -2,16 +2,16 @@ package slabmagic.datagen.tools
 
 import net.minecraft.block.Block
 import net.minecraft.data.client.*
+import net.minecraft.registry.Registries
 import net.minecraft.state.property.BooleanProperty
 import net.minecraft.state.property.IntProperty
 import net.minecraft.state.property.Property
 import net.minecraft.util.Identifier
-import net.minecraft.util.registry.Registry
 import java.util.*
 
 class SamModelGenerator(val generator: BlockStateModelGenerator) {
 
-    fun texid(block: Block, suffix: String="") = Registry.BLOCK.getId(block).let { Identifier(it.namespace,"block/"+it.path+suffix) }
+    fun texid(block: Block, suffix: String="") = Registries.BLOCK.getId(block).let { Identifier(it.namespace,"block/"+it.path+suffix) }
 
     /* MODELS */
     fun mChildOf(parent: Identifier, vararg tkeys: TextureKey) = Model(Optional.of(parent), Optional.empty(), *tkeys)
@@ -59,6 +59,20 @@ class SamModelGenerator(val generator: BlockStateModelGenerator) {
         val variants=BlockStateVariantMap.create(prop)
         models_ids.forEach { (value,id) ->
             variants.register(value,BlockStateVariant.create().put(VariantSettings.MODEL,id))
+        }
+        generator.blockStateCollector.accept(VariantsBlockStateSupplier.create(block).coordinate(variants))
+    }
+
+    fun <T: Comparable<T>, Y: Comparable<Y>> registerOnProp(block: Block, prop: Property<T>, prop2: Property<Y>, vararg models: Pair<Pair<T,Y>,TexturedModel.Factory>){
+        var first=true
+        val models_ids=models.map{ (value,model) ->
+            val id=model.upload(block, if(!first) "_$value" else "", generator.modelCollector)
+            first=false
+            value to id
+        }
+        val variants=BlockStateVariantMap.create(prop,prop2)
+        models_ids.forEach { (pair,id) ->
+            variants.register(pair.first,pair.second,BlockStateVariant.create().put(VariantSettings.MODEL,id))
         }
         generator.blockStateCollector.accept(VariantsBlockStateSupplier.create(block).coordinate(variants))
     }

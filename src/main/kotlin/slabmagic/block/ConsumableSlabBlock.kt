@@ -5,6 +5,7 @@ import net.minecraft.block.Blocks
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.Vec3d
 import slabmagic.block.entity.PartBlockEntity
+import slabmagic.components.SlabMagicComponents
 import slabmagic.helper.ColorTools
 import slabmagic.network.messages.sendSimpleParticleEffect
 import slabmagic.particle.MagicParticleEffect
@@ -15,8 +16,9 @@ class ConsumableSlabBlock(factory: FabricBlockEntityTypeBuilder.Factory<out Part
 
     override fun visit(visitor: PartVisitor, visited: SlabPartVisited): SlabPartVisited {
         val bentity=visited.block.world.getBlockEntity(visited.block.pos)
-        if(bentity is PartBlockEntity){
-            bentity.part?.let { visitor.visit(visited,it) }
+        val prt= bentity ?.components?.get(SlabMagicComponents.PART)
+        if(prt!=null){
+            visitor.visit(visited,prt.value())
         }
         val oldc=visited.consumer
         return visited.copy(

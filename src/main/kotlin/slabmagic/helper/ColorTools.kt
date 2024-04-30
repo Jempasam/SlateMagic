@@ -1,7 +1,8 @@
 package slabmagic.helper
 
 import net.minecraft.block.Block
-import net.minecraft.block.Material
+import net.minecraft.component.DataComponentTypes.FIRE_RESISTANT
+import net.minecraft.component.DataComponentTypes.FOOD
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnGroup
 import net.minecraft.entity.effect.StatusEffect
@@ -11,20 +12,20 @@ import net.minecraft.item.Item
 import net.minecraft.item.SpawnEggItem
 import net.minecraft.util.DyeColor
 import net.minecraft.util.math.ColorHelper.Argb.*
-import net.minecraft.util.math.Vec3f
+import org.joml.Vector3f
 import java.awt.Color
 
 object ColorTools {
 
-    fun vec(color: Int): Vec3f{
-        return Vec3f(
+    fun vec(color: Int): Vector3f{
+        return Vector3f(
             getRed(color)/255f,
             getGreen(color)/255f,
             getBlue(color)/255f
         )
     }
 
-    fun awt(vec: Vec3f): Color{
+    fun awt(vec: Vector3f): Color{
         return Color(
             vec.x,
             vec.y,
@@ -32,7 +33,7 @@ object ColorTools {
         )
     }
 
-    fun int(vec: Vec3f): Int{
+    fun int(vec: Vector3f): Int{
         return getArgb(
             255,
             (vec.x*255).toInt(),
@@ -44,11 +45,7 @@ object ColorTools {
     fun ofHash(obj: Any) = obj.hashCode()%0xffffff
 
     fun of(block: Block): Int {
-        return when (block.defaultState.material) {
-            Material.FIRE -> DyeColor.RED.fireworkColor
-            Material.PORTAL -> DyeColor.PURPLE.fireworkColor
-            else -> block.defaultState.material.color.color
-        }
+        return block.defaultMapColor.color
     }
 
 
@@ -112,10 +109,10 @@ object ColorTools {
 
                     ?: DyeColor.BLACK.fireworkColor.takeIf(item, "black", "dark", "void", "obsidian", "coal", "ink", "tar", "oil", "obsidian", "whiter", "coal")
 
-                    ?: DyeColor.BROWN.signColor.takeIf { item.isFood }
+                    ?: DyeColor.BROWN.signColor.takeIf { item.components.contains(FOOD) }
 
                     ?: (item as? DyeItem)?.color?.signColor
-                    ?: DyeColor.ORANGE.fireworkColor.takeIf { item.isFireproof }
+                    ?: DyeColor.ORANGE.fireworkColor.takeIf { item.components.contains(FIRE_RESISTANT) }
                     ?: ofHash(item.translationKey)
         }
     }

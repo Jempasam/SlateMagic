@@ -1,6 +1,6 @@
 package slabmagic.spell.effect
 
-import net.minecraft.util.math.Vec3f
+import org.joml.Vector3f
 import slabmagic.spell.SpellContext
 
 class PrecalculatedSpellEffect(val spell: SpellEffect): SpellEffect {
@@ -13,7 +13,7 @@ class PrecalculatedSpellEffect(val spell: SpellEffect): SpellEffect {
 
     override val cost = spell.cost
 
-    override val color: Vec3f = spell.color
+    override val color: Vector3f = spell.color
 
     override val shape = spell.shape
 

@@ -2,7 +2,7 @@ package slabmagic.spell.effect.action
 
 import net.minecraft.text.Text
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Vec3f
+import org.joml.Vector3f
 import slabmagic.helper.ColorTools
 import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
@@ -15,7 +15,7 @@ class BreakSpellEffect(val strength: Float): SpellEffect {
 
     override fun use(context: SpellContext): SpellContext? {
         pierce(context)
-        val bpos=BlockPos(context.pos)
+        val bpos=BlockPos.ofFloored(context.pos)
         val state=context.world.getBlockState(bpos)
         if(!state.isAir && state.getHardness(context.world,bpos)<strength){
             context.world.breakBlock(bpos,true)
@@ -30,7 +30,7 @@ class BreakSpellEffect(val strength: Float): SpellEffect {
 
     override val cost: Int get() = 1+strength.toInt()*3
 
-    override val color: Vec3f get() = ColorTools.vec(0x3E4E4F)
+    override val color: Vector3f get() = ColorTools.vec(0x3E4E4F)
 
     override val shape: SpellShape get() = SpellShape(
         Array(4) {SpellShape.Circle(8, 20, 0, 30, 1, 40, 4)}.also {

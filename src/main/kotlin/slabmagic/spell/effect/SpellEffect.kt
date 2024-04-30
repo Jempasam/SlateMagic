@@ -1,7 +1,7 @@
 package slabmagic.spell.effect
 
 import net.minecraft.text.Text
-import net.minecraft.util.math.Vec3f
+import org.joml.Vector3f
 import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
 
@@ -34,7 +34,7 @@ interface SpellEffect {
     /**
      * @return the color of the spell effect.
      */
-    val color: Vec3f
+    val color: Vector3f
 
     /**
      * @return the shape of the spell effect.

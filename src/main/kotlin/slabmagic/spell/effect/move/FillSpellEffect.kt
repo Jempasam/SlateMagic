@@ -1,7 +1,7 @@
 package slabmagic.spell.effect.move
 
 import net.minecraft.text.Text
-import net.minecraft.util.math.Vec3f
+import org.joml.Vector3f
 import net.minecraft.util.math.Vec3i
 import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
@@ -15,7 +15,7 @@ class FillSpellEffect(val spell: SpellEffect, val size: Vec3i): SpellEffect {
     override val name: Text get() = spellName("fill", spell.name)
     override val description: Text get() = spellDesc("fill", size.x, size.y, size.z, spell.description)
 
-    override val color: Vec3f get() = spell.color
+    override val color: Vector3f get() = spell.color
 
     override val cost: Int get() = (sqrt(size.x*size.y*size.z.toDouble())*spell.cost).toInt()
 

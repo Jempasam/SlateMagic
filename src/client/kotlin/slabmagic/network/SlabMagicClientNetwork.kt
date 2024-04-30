@@ -1,11 +1,12 @@
 package slabmagic.network
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.PlayChannelHandler
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.PlayPayloadHandler
 import net.minecraft.client.MinecraftClient
-import net.minecraft.network.PacketByteBuf
+import net.minecraft.network.packet.CustomPayload
 import net.minecraft.world.World
 import slabmagic.network.messages.AdvancedParticleMessage
+import slabmagic.network.messages.AdvancedParticleMessage.Shape.*
 import slabmagic.network.messages.PlayerMovementMessage
 import slabmagic.particle.AdvancedParticle
 
@@ -13,74 +14,46 @@ object SlabMagicClientNetwork {
 
     init{
         /* LINE */
-        ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.LINE, particleHandler {
-            AdvancedParticle.line(it, effect, from, to, speed, spreadingOrCount)
-        })
-        ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.LIGHTNING, particleHandler {
-            AdvancedParticle.lightning(it, effect, from, to, speed, spreadingOrCount.toInt())
-        })
-        ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.CURVE, particleHandler {
-            AdvancedParticle.curve(it, effect, from, to, speed, spreadingOrCount)
-        })
+        ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.ID, particleHandler {
+            when(shape){
+                LINE -> AdvancedParticle.line(it, effect, from, to, speed, spreadingOrCount)
+                LIGHTNING -> AdvancedParticle.lightning(it, effect, from, to, speed, spreadingOrCount.toInt())
+                CURVE -> AdvancedParticle.curve(it, effect, from, to, speed, spreadingOrCount)
 
-        /* BOX */
-        ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.BOX, particleHandler {
-            AdvancedParticle.box(it, effect, from, to, speed, spreadingOrCount.toInt())
-        })
-        ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.CLOUD, particleHandler {
-            AdvancedParticle.cloud(it, effect, from, to, speed, spreadingOrCount.toInt())
-        })
+                BOX -> AdvancedParticle.box(it, effect, from, to, speed, spreadingOrCount.toInt())
+                CLOUD -> AdvancedParticle.cloud(it, effect, from, to, speed, spreadingOrCount.toInt())
 
-        /* BOOM AND MOVING ZONE*/
-        ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.BOOM, particleHandler {
-            AdvancedParticle.boom(it, effect, from, to, speed, spreadingOrCount.toInt())
-        })
-        ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.CLOUD_BOOM, particleHandler {
-            AdvancedParticle.cloudboom(it, effect, from, to, speed, spreadingOrCount.toInt())
-        })
-        ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.IMPLODE, particleHandler {
-            AdvancedParticle.implode(it, effect, from, to, speed, spreadingOrCount.toInt())
-        })
-        ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.SPIRAL, particleHandler {
-            AdvancedParticle.spiral(it, effect, from, to, speed, spreadingOrCount.toInt())
-        })
-        ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.STORM, particleHandler {
-            AdvancedParticle.storm(it, effect, from, to, speed, spreadingOrCount.toInt())
-        })
+                BOOM -> AdvancedParticle.boom(it, effect, from, to, speed, spreadingOrCount.toInt())
+                CLOUD_BOOM -> AdvancedParticle.cloudboom(it, effect, from, to, speed, spreadingOrCount.toInt())
+                IMPLODE -> AdvancedParticle.implode(it, effect, from, to, speed, spreadingOrCount.toInt())
+                SPIRAL -> AdvancedParticle.spiral(it, effect, from, to, speed, spreadingOrCount.toInt())
+                STORM -> AdvancedParticle.storm(it, effect, from, to, speed, spreadingOrCount.toInt())
 
-        /* RING */
-        ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.TORNADO, particleHandler {
-            AdvancedParticle.tornado(it, effect, from, to, speed, spreadingOrCount.toInt())
+                TORNADO -> AdvancedParticle.tornado(it, effect, from, to, speed, spreadingOrCount.toInt())
+                RING -> AdvancedParticle.ring(it, effect, from, to, speed, spreadingOrCount.toInt())
+                SHOCKWAVE -> AdvancedParticle.shockwave(it, effect, from, to, speed, spreadingOrCount.toInt())
+            }
         })
-        ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.RING, particleHandler {
-            AdvancedParticle.ring(it, effect, from, to, speed, spreadingOrCount.toInt())
-        })
-        ClientPlayNetworking.registerGlobalReceiver(AdvancedParticleMessage.SHOCKWAVE, particleHandler {
-            AdvancedParticle.shockwave(it, effect, from, to, speed, spreadingOrCount.toInt())
-        })
-
         /* MOVEMENT */
-        ClientPlayNetworking.registerGlobalReceiver(PlayerMovementMessage.ID, handler(::PlayerMovementMessage) {
+        ClientPlayNetworking.registerGlobalReceiver(PlayerMovementMessage.ID, handler{ message ->
             MinecraftClient.getInstance().player?.apply {
-                velocity=it.velocity
+                velocity=message.velocity
                 velocityDirty=true
             }
         })
 
     }
 
-    private inline fun <T> handler(crossinline const: (PacketByteBuf)->T, crossinline function: (T)->Unit): PlayChannelHandler{
-        return PlayChannelHandler { client, handler, buf, _ ->
-            val message=const(buf)
-            client.execute{ function(message) }
+    private fun <T: CustomPayload> handler(function: (T)->Unit): PlayPayloadHandler<T>{
+        return PlayPayloadHandler<T> { message, context ->
+            context.client().execute{ function(message) }
         }
     }
 
-    private inline fun particleHandler(crossinline function: AdvancedParticleMessage.(World)->Unit): PlayChannelHandler{
-        return PlayChannelHandler { client, handler, buf, _ ->
-            val message=AdvancedParticleMessage(buf)
-            if(message.world == handler.world?.registryKey){
-                client.execute{ message.function(handler.world) }
+    private fun particleHandler(function: AdvancedParticleMessage.(World)->Unit): PlayPayloadHandler<AdvancedParticleMessage>{
+        return PlayPayloadHandler { message, context ->
+            if(message.world == context.client().world?.registryKey){
+                context.client().execute{ message.function(context.client().world!!) }
             }
         }
     }

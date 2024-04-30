@@ -12,10 +12,10 @@ import net.minecraft.command.CommandRegistryAccess
 import net.minecraft.command.argument.serialize.ArgumentSerializer
 import net.minecraft.command.argument.serialize.ArgumentSerializer.ArgumentTypeProperties
 import net.minecraft.network.PacketByteBuf
+import net.minecraft.registry.Registries
+import net.minecraft.registry.Registry
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
-import net.minecraft.util.registry.BuiltinRegistries
-import net.minecraft.util.registry.Registry
 import slabmagic.registry.SlabMagicRegistry
 import java.util.concurrent.CompletableFuture
 
@@ -104,10 +104,10 @@ class RegistryArgumentType<T>(val registry: Registry<T>, val baseNamespace: Stri
         }
 
         fun getRegistry(id: Identifier): Registry<*>{
-            return Registry.REGISTRIES.get(id)
-                ?: BuiltinRegistries.REGISTRIES.get(id)
+            return Registries.REGISTRIES.get(id)
+                //?: BuiltinRegistries.REGISTRIES.get(id)
                 ?: SlabMagicRegistry.DYNAMICS.get(id)
-                ?: Registry.ENCHANTMENT
+                ?: Registries.ENCHANTMENT
         }
     }
 

@@ -1,25 +1,27 @@
 package slabmagic.datagen
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider
 import net.minecraft.block.Block
 import net.minecraft.loot.LootPool
 import net.minecraft.loot.LootTable
 import net.minecraft.loot.entry.ItemEntry
-import net.minecraft.loot.function.CopyNbtLootFunction
-import net.minecraft.loot.provider.nbt.ContextLootNbtProvider
+import net.minecraft.loot.function.CopyComponentsLootFunction
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider
+import net.minecraft.registry.RegistryWrapper
 import slabmagic.block.SlabMagicBlocks
+import slabmagic.components.SlabMagicComponents
+import java.util.concurrent.CompletableFuture
 
-class SlabMagicLootGenerator(gen: FabricDataGenerator) : FabricBlockLootTableProvider(gen) {
-    override fun generateBlockLootTables() {
+class SlabMagicLootGenerator(output: FabricDataOutput, reg: CompletableFuture<RegistryWrapper.WrapperLookup>) : FabricBlockLootTableProvider(output,reg) {
+    override fun generate() {
         // Node Block Entity
         fun addDropSpellPart(block: Block){
             addDrop(block, LootTable.builder()
                 .pool(LootPool.builder().rolls(ConstantLootNumberProvider.create(1f))
                     .with(ItemEntry.builder(block)
-                        .apply(CopyNbtLootFunction.builder(ContextLootNbtProvider.BLOCK_ENTITY)
-                            .withOperation("node","BlockEntityTag.node")
+                        .apply(CopyComponentsLootFunction.builder(CopyComponentsLootFunction.Source.BLOCK_ENTITY)
+                            .include(SlabMagicComponents.PART)
                         )
                     )
                 )

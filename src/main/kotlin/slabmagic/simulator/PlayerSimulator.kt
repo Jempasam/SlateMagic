@@ -17,7 +17,7 @@ import net.minecraft.world.World
 import java.util.*
 
 class PlayerSimulator(world: World, pos: BlockPos)
-    : PlayerEntity(world, pos, 0f, GameProfile(UUID.randomUUID(),"Player"), null)
+    : PlayerEntity(world, pos, 0f, GameProfile(UUID.randomUUID(),"Player"))
 {
     override fun isSpectator() = false
 

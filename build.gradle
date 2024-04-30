@@ -1,7 +1,7 @@
 plugins {
-	id 'fabric-loom' version '1.3-SNAPSHOT'
+	id 'fabric-loom' version '1.6-SNAPSHOT'
 	id 'maven-publish'
-  id "org.jetbrains.kotlin.jvm" version "1.9.10"
+  	id "org.jetbrains.kotlin.jvm" version "1.9.23"
 }
 
 version = project.mod_version
@@ -20,10 +20,13 @@ repositories {
 		name = "Modrinth"
 		url = "https://api.modrinth.com/maven"
 	}
+	maven { url 'https://maven.wispforest.io' }
 }
 
 loom {
     splitEnvironmentSourceSets()
+
+	accessWidenerPath = file("src/main/resources/slab-magic.accesswidener")
 
 	mods {
 		"slab-magic" {
@@ -37,6 +40,7 @@ loom {
 			inherit client
 			name "Data Generation"
 			vmArg "-Dfabric-api.datagen"
+			vmArg "-DdatagenTarget=main"
 			vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
 			vmArg "-Dfabric-api.datagen.modid=${archives_base_name}"
 			runDir "build/datagen"
@@ -45,6 +49,7 @@ loom {
 			inherit client
 			name "Client Data Generation"
 			vmArg "-Dfabric-api.datagen"
+			vmArg "-DdatagenTarget=client"
 			vmArg "-Dfabric-api.datagen.output-dir=${file("src/client/generated")}"
 			vmArg "-Dfabric-api.datagen.modid=${archives_base_name}"
 			runDir "build/datagen"
@@ -63,12 +68,15 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
 
-	modRuntimeOnly "maven.modrinth:1eAoo2KR:2.2.0-for-1.19.2"
-	modRuntimeOnly "maven.modrinth:adaptive-tooltips:1.0.1"
+	//modRuntimeOnly "maven.modrinth:1eAoo2KR:2.2.0-for-1.19.2"
+	//modRuntimeOnly "maven.modrinth:adaptive-tooltips:1.0.1"
 
-	modApi include("com.unascribed:lib39-core:1.4.2")
-	modApi include("com.unascribed:lib39-fractal:1.4.2")
-	// Uncomment the following line to enable the deprecated Fabric API modules. 
+	//modImplementation "maven.modrinth:owo-lib:${project.owo_version}"
+	//include "maven.modrinth:owo-lib:${project.owo_version}"
+
+	modImplementation files("../samoussa-lib/build/libs/samoussa-lib-${project.samoussa_version}.jar")
+	include files("../samoussa-lib/build/libs/samoussa-lib-1.0.0.jar")
+	// Uncomment the following line to enable the deprecated Fabric API modules.
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
 
 	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
@@ -89,6 +97,12 @@ tasks.withType(JavaCompile).configureEach {
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 	kotlinOptions {
 		jvmTarget = 17
+	}
+}
+
+kotlin {
+	compilerOptions{
+		freeCompilerArgs.add("-Xunrestricted-builder-inference")
 	}
 }
 

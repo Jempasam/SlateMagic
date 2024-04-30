@@ -1,65 +1,68 @@
 package slabmagic.command.commands
 
+import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.DoubleArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
+import net.minecraft.command.CommandRegistryAccess
 import net.minecraft.command.argument.EntityArgumentType
 import net.minecraft.command.argument.ParticleEffectArgumentType
 import net.minecraft.command.argument.Vec3ArgumentType
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.util.Identifier
 import slabmagic.network.ServerNetwork
 import slabmagic.network.messages.AdvancedParticleMessage
+import slabmagic.network.messages.AdvancedParticleMessage.Shape.*
 
-object ParticleEffectCommand {
+object ParticleEffectCommand: CommandRegistrationCallback {
 
+    override fun register(disp: CommandDispatcher<ServerCommandSource>, registry: CommandRegistryAccess, env: CommandManager.RegistrationEnvironment) {
+        val ROOT= CommandManager.literal("particleeffect").then(
+            CommandManager.argument("effect", ParticleEffectArgumentType.particleEffect(registry)).then(
+                CommandManager.argument("position", Vec3ArgumentType.vec3()).then(
+                    CommandManager.argument("velocity", Vec3ArgumentType.vec3(false)).then(
+                        CommandManager.argument("viewer", EntityArgumentType.players()).then(
 
-    val ROOT= CommandManager.literal("particleeffect").then(
-        CommandManager.argument("effect", ParticleEffectArgumentType.particleEffect()).then(
-            CommandManager.argument("position", Vec3ArgumentType.vec3()).then(
-                CommandManager.argument("velocity", Vec3ArgumentType.vec3(false)).then(
-                    CommandManager.argument("viewer", EntityArgumentType.players()).then(
+                            // LINE
+                            sendParticle( "line", LINE, "to", "spreading", true)
+                        ).then(
+                            sendParticle( "curve", CURVE, "to", "curvature", true)
+                        ).then(
+                            sendParticle("lightning", LIGHTNING, "to", "bend count", true)
+                        ).then(
 
-                        // LINE
-                        sendParticle( "line", AdvancedParticleMessage.LINE, "to", "spreading", true)
-                    ).then(
-                        sendParticle( "curve", AdvancedParticleMessage.CURVE, "to", "curvature", true)
-                    ).then(
-                        sendParticle("lightning", AdvancedParticleMessage.LIGHTNING, "to", "bend count", true)
-                    ).then(
+                            // BOX
+                            sendParticle("box", BOX, "size", "count", false)
+                        ).then(
+                            sendParticle("cloud", CLOUD, "size", "count", false)
+                        ).then(
 
-                        // BOX
-                        sendParticle("box", AdvancedParticleMessage.BOX, "size", "count", false)
-                    ).then(
-                        sendParticle("cloud", AdvancedParticleMessage.CLOUD, "size", "count", false)
-                    ).then(
+                            // BOOM AND MOTION ZONE
+                            sendParticle("boom", BOOM, "speed", "count", false)
+                        ).then(
+                            sendParticle("cloudboom", CLOUD_BOOM, "speed", "count", false)
+                        ).then(
+                            sendParticle("implode", IMPLODE, "size", "count", false)
+                        ).then(
+                            sendParticle("spiral", SPIRAL, "size", "count", false)
+                        ).then(
+                            sendParticle("storm", STORM, "size and speed", "count", false)
+                        ).then(
 
-                        // BOOM AND MOTION ZONE
-                        sendParticle("boom", AdvancedParticleMessage.BOOM, "speed", "count", false)
-                    ).then(
-                        sendParticle("cloudboom", AdvancedParticleMessage.CLOUD_BOOM, "speed", "count", false)
-                    ).then(
-                        sendParticle("implode", AdvancedParticleMessage.IMPLODE, "size", "count", false)
-                    ).then(
-                        sendParticle("spiral", AdvancedParticleMessage.SPIRAL, "size", "count", false)
-                    ).then(
-                        sendParticle("storm", AdvancedParticleMessage.STORM, "size and speed", "count", false)
-                    ).then(
-
-                        // RINGS
-                        sendParticle("ring", AdvancedParticleMessage.RING, "size", "count", false)
-                    ).then(
-                        sendParticle("shockwave", AdvancedParticleMessage.SHOCKWAVE, "size", "count", false)
-                    ).then(
-                        sendParticle("tornado", AdvancedParticleMessage.TORNADO, "size", "count", false)
+                            // RINGS
+                            sendParticle("ring", RING, "size", "count", false)
+                        ).then(
+                            sendParticle("shockwave", SHOCKWAVE, "size", "count", false)
+                        ).then(
+                            sendParticle("tornado", TORNADO, "size", "count", false)
+                        )
                     )
                 )
             )
         )
-    )
+    }
 
-
-    private fun sendParticle(name: String, type: Identifier, toName: String, countName: String, centerInteger: Boolean): LiteralArgumentBuilder<ServerCommandSource> {
+    private fun sendParticle(name: String, shape: AdvancedParticleMessage.Shape, toName: String, countName: String, centerInteger: Boolean): LiteralArgumentBuilder<ServerCommandSource> {
         return CommandManager.literal(name).then(
             CommandManager.argument(toName, Vec3ArgumentType.vec3(centerInteger)).then(
                 CommandManager.argument(countName, DoubleArgumentType.doubleArg(0.0)).executes { context ->
@@ -70,9 +73,10 @@ object ParticleEffectCommand {
                     val spreading= DoubleArgumentType.getDouble(context, countName)
                     val viewers= EntityArgumentType.getPlayers(context, "viewer")
                     ServerNetwork.sendToAll(
-                        viewers, type,
+                        viewers,
                         AdvancedParticleMessage(
                             effect,
+                            shape,
                             context.source.world.registryKey,
                             from, to,
                             speed, spreading
@@ -83,6 +87,5 @@ object ParticleEffectCommand {
             )
         )
     }
-
 
 }

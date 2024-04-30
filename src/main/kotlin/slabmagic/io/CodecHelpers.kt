@@ -2,15 +2,16 @@ package slabmagic.io
 
 import net.minecraft.block.Block
 import net.minecraft.entity.effect.StatusEffect
+import net.minecraft.registry.Registries
+import net.minecraft.registry.Registry
+import net.minecraft.registry.RegistryKey
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Vec3d
-import net.minecraft.util.registry.Registry
-import net.minecraft.util.registry.RegistryKey
 import slabmagic.io.deserialization.DecoderTarget
 import slabmagic.io.serialization.EncoderTarget
 
-// Registry
+// Registries
 fun <Y,T> EncoderTarget<T>.createReg(obj: Y, reg: Registry<Y>): T{
     val id= reg.getId(obj) ?: throw Exception(obj.toString()+" is not registred")
     return create(id.toString())
@@ -22,12 +23,12 @@ fun <Y,T> DecoderTarget<T>.asReg(element: T, reg: Registry<Y>): Y{
 }
 
 // Block
-fun <T> EncoderTarget<T>.create(block: Block): T = createReg(block,Registry.BLOCK)
-fun <T> DecoderTarget<T>.asBlock(element: T) = asReg(element, Registry.BLOCK)
+fun <T> EncoderTarget<T>.create(block: Block): T = createReg(block,Registries.BLOCK)
+fun <T> DecoderTarget<T>.asBlock(element: T) = asReg(element, Registries.BLOCK)
 
 // Potion
-fun <T> EncoderTarget<T>.create(effect: StatusEffect): T = createReg(effect,Registry.STATUS_EFFECT)
-fun <T> DecoderTarget<T>.asStatusEffect(element: T) = asReg(element, Registry.STATUS_EFFECT)
+fun <T> EncoderTarget<T>.create(effect: StatusEffect): T = createReg(effect,Registries.STATUS_EFFECT)
+fun <T> DecoderTarget<T>.asStatusEffect(element: T) = asReg(element, Registries.STATUS_EFFECT)
 
 // Vec3d
 fun <T> EncoderTarget<T>.create(vec: Vec3d): T{

@@ -96,7 +96,7 @@ class WandItem(val action: Action, settings: Settings) : Item(settings) {
         fun composition(visited: SlabPartVisited, player: ServerPlayerEntity?, spell: AssembledSpell, power: Int): ActionResult {
             val composition=Text.empty()
             for(part in spell.parts){
-                composition.append(part.name.copy().setStyle(Style.EMPTY.withColor(ColorTools.int(part.color))))
+                composition.append(part.value().name.copy().setStyle(Style.EMPTY.withColor(ColorTools.int(part.value().color))))
                 composition.append(Text.of(" > "))
             }
             if(spell.parts.isNotEmpty())composition.siblings.removeLast()

@@ -8,7 +8,7 @@ import net.minecraft.client.render.Camera
 import net.minecraft.client.render.VertexConsumer
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Matrix4f
+import org.joml.Matrix4f
 import slabmagic.shape.painter.CircleVertexPainter
 import slabmagic.shape.painter.IncompletePartPainter
 import slabmagic.shape.painter.vertex.ParticleVPC
@@ -56,9 +56,11 @@ class SpellCircleMovingParticle(
         val vibration = (sin(time/4f)/20+0.1f)/size
 
         val matrix=Matrix4f()
-        matrix.loadIdentity()
-        matrix.multiply(Matrix4f.scale(size,size,size))
-        matrix.multiplyByTranslation(f/size,g/size,h/size)
+        matrix.identity()
+        matrix.scale(size,size,size)
+        matrix.translate(f/size,g/size,h/size)
+        //matrix.multiply(Matrix4f.scale(size,size,size))
+        //matrix.multiplyByTranslation(f/size,g/size,h/size)
 
         run {
             val painter = IncompletePartPainter(
@@ -68,7 +70,8 @@ class SpellCircleMovingParticle(
             shape.draw(painter, time/10.0/size)
         }
 
-        matrix.multiplyByTranslation(0f,0.02f/size,0f)
+        //matrix.multiplyByTranslation(0f,0.02f/size,0f)
+        matrix.translate(0f,0.02f/size,0f)
 
         run{
             val painter=IncompletePartPainter(

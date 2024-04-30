@@ -1,9 +1,9 @@
 package slabmagic.particle
 
-import net.minecraft.client.util.math.Vector3d
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
+import org.joml.Vector3d
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin

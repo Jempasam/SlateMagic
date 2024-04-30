@@ -3,7 +3,7 @@ package slabmagic.spell.effect.action
 import net.minecraft.block.Block
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
-import net.minecraft.util.math.Vec3f
+import org.joml.Vector3f
 import slabmagic.helper.ColorTools
 import slabmagic.network.messages.sendParticleEffect
 import slabmagic.particle.EnergyBlockParticleEffect
@@ -18,7 +18,7 @@ class BlockReplaceSpellEffect(val replaced: Set<Block>, val block: Block): Spell
 
     override fun use(context: SpellContext): SpellContext {
         pierce(context)
-        val bpos=BlockPos(context.pos)
+        val bpos=BlockPos.ofFloored(context.pos)
         if(replaced.contains(context.world.getBlockState(bpos).block)){
             context.world.setBlockState(bpos,block.defaultState)
             val color=color
@@ -34,7 +34,7 @@ class BlockReplaceSpellEffect(val replaced: Set<Block>, val block: Block): Spell
 
     override val cost: Int get() = 5
 
-    override val color: Vec3f get() = ColorTools.vec(ColorTools.of(block))
+    override val color: Vector3f get() = ColorTools.vec(ColorTools.of(block))
 
     override val shape: SpellShape get() = SpellShape(
         Array(4) {SpellShape.Circle(8, 0, 0, 20, 1, 0, 0)}

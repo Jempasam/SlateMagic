@@ -5,6 +5,7 @@ import net.minecraft.entity.EntityType
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
+import slabmagic.entity.data.SpellEntity
 import slabmagic.network.messages.AdvancedParticleMessage
 import slabmagic.network.messages.sendParticleEffect
 import slabmagic.particle.MagicParticleEffect
@@ -19,8 +20,8 @@ class SpellCurseEntity : SpellFollowingEntity{
 
     constructor(type: EntityType<*>, world: World) : super(type, world)
 
-    constructor(type: EntityType<*>, world: World, spell: AssembledSpell, power: Int, range: Float, remainingShoot: Int, cadency: Int, endSpell: AssembledSpell?=null)
-            : super(type, world, listOfNotNull(spell,endSpell), power, range)
+    constructor(type: EntityType<*>, world: World, spell: AssembledSpell, context: SpellContext.Stored, range: Float, remainingShoot: Int, cadency: Int, endSpell: AssembledSpell?=null)
+            : super(type, world, SpellEntity.Data(listOfNotNull(spell,endSpell),context), range)
     {
         this.range = range
         this.remainingshoot = remainingShoot
@@ -33,14 +34,13 @@ class SpellCurseEntity : SpellFollowingEntity{
         time++
         val range=range.toDouble()
         if(time>cadency){
-            val context= SpellContext.at(target,power)
-            context.markeds.addAll(markeds)
-            val spell=if(spells.size>1 && remainingshoot==1) spells[1].effect else spells[0].effect
+            val context= SpellContext.at(target,stored)
+            val spell= if(spells.size>1 && remainingshoot==1) spells[1].effect else spells[0].effect
             spell.use(context)
             sendParticleEffect(context.world,
                 MagicParticleEffect(spell.color, 0.5f),
                 context.pos,
-                AdvancedParticleMessage.SHOCKWAVE,
+                AdvancedParticleMessage.Shape.SHOCKWAVE,
                 Vec3d(range,0.0,range),
                 15.0*range
             )

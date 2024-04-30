@@ -1,21 +1,22 @@
 package slabmagic.datagen
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider
 import net.minecraft.block.Block
 import net.minecraft.client.recipebook.RecipeBookGroup
-import net.minecraft.data.server.RecipeProvider
-import net.minecraft.data.server.recipe.RecipeJsonProvider
+import net.minecraft.data.server.recipe.RecipeExporter
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder
 import net.minecraft.data.server.recipe.ShapelessRecipeJsonBuilder
 import net.minecraft.item.Item
 import net.minecraft.item.Items
+import net.minecraft.recipe.book.RecipeCategory.BUILDING_BLOCKS
+import net.minecraft.registry.RegistryWrapper
 import slabmagic.block.SlabMagicBlocks
 import slabmagic.item.SlabMagicItems
-import java.util.function.Consumer
+import java.util.concurrent.CompletableFuture
 
-class SlabMagicRecipeGenerator(dataGenerator: FabricDataGenerator) : FabricRecipeProvider(dataGenerator) {
-    override fun generateRecipes(exporter: Consumer<RecipeJsonProvider>) {
+class SlabMagicRecipeGenerator(dataGenerator: FabricDataOutput, reg: CompletableFuture<RegistryWrapper.WrapperLookup>) : FabricRecipeProvider(dataGenerator,reg) {
+    override fun generate(exporter: RecipeExporter) {
         val coppers= arrayOf(
             Items.COPPER_BLOCK, Items.EXPOSED_COPPER, Items.WEATHERED_COPPER, Items.OXIDIZED_COPPER,
             Items.WAXED_COPPER_BLOCK, Items.WAXED_EXPOSED_COPPER, Items.WAXED_WEATHERED_COPPER, Items.WAXED_OXIDIZED_COPPER
@@ -28,22 +29,22 @@ class SlabMagicRecipeGenerator(dataGenerator: FabricDataGenerator) : FabricRecip
 
         fun cuttingRecipe(from: Item, to: Item) {
             println("cutting ${from.name.string} to ${to.name.string}")
-            ShapedRecipeJsonBuilder.create(to,4)
+            ShapedRecipeJsonBuilder.create(BUILDING_BLOCKS,to,4)
                 .input('a', from)
                 .pattern("aa")
                 .pattern("aa")
-                .criterion("has_ingredient", RecipeProvider.conditionsFromItem(from))
+                .criterion("has_ingredient", conditionsFromItem(from))
                 .group(RecipeBookGroup.CRAFTING_BUILDING_BLOCKS.name)
                 .offerTo(exporter)
         }
 
         fun grid(from: Item, to: Block, count: Int = 1) {
-            ShapedRecipeJsonBuilder.create(to,count)
+            ShapedRecipeJsonBuilder.create(BUILDING_BLOCKS,to,count)
                 .input('a', from)
                 .pattern("a a")
                 .pattern(" a ")
                 .pattern("a a")
-                .criterion("has_ingredient", RecipeProvider.conditionsFromItem(from))
+                .criterion("has_ingredient", conditionsFromItem(from))
                 .group(RecipeBookGroup.CRAFTING_BUILDING_BLOCKS.name)
                 .offerTo(exporter)
         }
@@ -58,10 +59,10 @@ class SlabMagicRecipeGenerator(dataGenerator: FabricDataGenerator) : FabricRecip
         coppers.zip(SlabMagicBlocks.COPPER_WINDOW).forEach { (a, b) -> grid(a,b) }
 
         /* METAL SANDWICH */
-        ShapedRecipeJsonBuilder.create(SlabMagicItems.METAL_SANDWICH.unwaxed[0])
+        ShapedRecipeJsonBuilder.create(BUILDING_BLOCKS,SlabMagicItems.METAL_SANDWICH.unwaxed[0])
             .input('i',Items.IRON_INGOT).input('c',Items.COPPER_INGOT)
             .pattern("ccc").pattern("iii").pattern("ccc")
-            .criterion("has_ingredient", RecipeProvider.conditionsFromItem(Items.COPPER_INGOT))
+            .criterion("has_ingredient", conditionsFromItem(Items.COPPER_INGOT))
             .offerTo(exporter)
 
         /* WAXING */
@@ -71,9 +72,9 @@ class SlabMagicRecipeGenerator(dataGenerator: FabricDataGenerator) : FabricRecip
             SlabMagicItems.METAL_SANDWICH
         ).forEach {blocks ->
             for(i in 0..<4){
-                ShapelessRecipeJsonBuilder.create(blocks.waxed[i])
+                ShapelessRecipeJsonBuilder.create(BUILDING_BLOCKS,blocks.waxed[i])
                     .input(blocks.unwaxed[i]).input(Items.HONEYCOMB)
-                    .criterion("has_ingredient", RecipeProvider.conditionsFromItem(blocks.unwaxed[i]))
+                    .criterion("has_ingredient", conditionsFromItem(blocks.unwaxed[i]))
                     .offerTo(exporter)
             }
         }

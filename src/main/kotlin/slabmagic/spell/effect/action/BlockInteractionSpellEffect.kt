@@ -1,7 +1,7 @@
 package slabmagic.spell.effect.action
 
 import net.minecraft.block.Block
-import net.minecraft.util.math.Vec3f
+import org.joml.Vector3f
 import slabmagic.entity.BlockFollowingEntity
 import slabmagic.entity.SlabMagicEntities
 import slabmagic.helper.ColorTools
@@ -17,14 +17,14 @@ import kotlin.math.sqrt
 class BlockInteractionSpellEffect(val block: Block, val duration: Int): SpellEffect {
 
     override fun use(context: SpellContext): SpellContext {
-        val levelDuration=(duration* sqrt(context.power.toFloat())).toInt()
+        val levelDuration=(duration* sqrt(context.stored.power.toFloat())).toInt()
         val trap= BlockFollowingEntity(SlabMagicEntities.BLOCK_FOLLOWING, context.world, levelDuration)
         trap.block=block
         trap.setPosition(context.pos)
         context.world.spawnEntity(trap)
         val color=color
         sendParticleEffect(context.world, EnergyBlockParticleEffect(color,color, 0.5f), context.pos)
-        return SpellContext.at(trap,context.power)
+        return SpellContext.at(trap,context.stored)
     }
 
     override val name get() = spellName("block_interaction",block.name)
@@ -33,7 +33,7 @@ class BlockInteractionSpellEffect(val block: Block, val duration: Int): SpellEff
 
     override val cost: Int get() = duration/4
 
-    override val color: Vec3f get() = ColorTools.vec(ColorTools.of(block))
+    override val color: Vector3f get() = ColorTools.vec(ColorTools.of(block))
 
     override val shape: SpellShape get() = SpellShape(
         Array(4) {SpellShape.Circle(8, 0, 0, 50, 1, 0, 0)}

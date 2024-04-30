@@ -10,7 +10,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
-import slabmagic.entity.tracked.tracked
+import slabmagic.entity.tracked.provideDelegate
 import java.util.*
 import kotlin.math.abs
 
@@ -26,15 +26,15 @@ abstract class FollowingEntity(type: EntityType<*>, world: World, range: Float =
         get() = dataTracker[TARGET]?.let { if(it.isPresent) it.asInt else null } ?.let { world.getEntityById(it) }
         set(value) = dataTracker.set(TARGET, if(value==null) OptionalInt.empty() else OptionalInt.of(value.id))
 
-    var range by tracked(RANGE)
+    var range by RANGE
+
+    override fun initDataTracker(builder: DataTracker.Builder) {
+        builder.add(RANGE,1.0f)
+        builder.add(TARGET, null)
+    }
 
     init {
         this.range=range
-    }
-
-    override fun initDataTracker() {
-        dataTracker.startTracking(RANGE, 1.0f)
-        dataTracker.startTracking(TARGET, null)
     }
 
     override fun tick() {

@@ -2,7 +2,7 @@ package slabmagic.spell.effect.action
 
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.Vec3d
-import net.minecraft.util.math.Vec3f
+import org.joml.Vector3f
 import slabmagic.helper.ColorTools
 import slabmagic.network.messages.AdvancedParticleMessage
 import slabmagic.network.messages.push
@@ -32,7 +32,7 @@ class PushSpellEffect(val strength: Float): SpellEffect {
             context.world,
             MagicParticleEffect(color, 0.5f),
             entity.pos.add(0.0,0.5,0.0),
-            AdvancedParticleMessage.BOOM,
+            AdvancedParticleMessage.Shape.BOOM,
             Vec3d(.2,.2,.2),
             strength*3.0
         )
@@ -45,7 +45,7 @@ class PushSpellEffect(val strength: Float): SpellEffect {
 
     override val cost: Int get() = (5*strength).toInt()
 
-    override val color: Vec3f get() = ColorTools.vec(0xBED3FF).copy().apply {lerp(ColorTools.vec(0xDFF5FF), min(1f,strength))}
+    override val color: Vector3f get() = ColorTools.vec(0xBED3FF).lerp(ColorTools.vec(0xDFF5FF), min(1f,strength))
 
     override val shape: SpellShape get() = SpellShape(
         Array(4) {SpellShape.Circle(3, 30, 0, 0, 1, -20, 1)}

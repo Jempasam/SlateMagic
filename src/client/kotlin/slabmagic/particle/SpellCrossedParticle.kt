@@ -8,7 +8,7 @@ import net.minecraft.client.render.Camera
 import net.minecraft.client.render.VertexConsumer
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Matrix4f
+import org.joml.Matrix4f
 import slabmagic.shape.painter.CrossedVertexPainter
 import slabmagic.shape.painter.IncompletePartPainter
 import slabmagic.shape.painter.vertex.ParticleVPC
@@ -53,9 +53,11 @@ class SpellCrossedParticle(
         val updown = (1.0- abs(1.0-completness*2))*150
 
         val matrix=Matrix4f()
-        matrix.loadIdentity()
-        matrix.multiply(Matrix4f.scale(size,size,size))
-        matrix.multiplyByTranslation(f/size,g/size,h/size)
+        matrix.identity()
+        matrix.scale(size,size,size)
+        matrix.translate(f,g,h)
+        //matrix.multiply(Matrix4f.scale(size,size,size))
+        //matrix.multiplyByTranslation(f/size,g/size,h/size)
 
         run {
             val painter = IncompletePartPainter(

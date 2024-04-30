@@ -8,7 +8,7 @@ import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.DyeColor
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3f
+import net.minecraft.util.math.RotationAxis
 import slabmagic.SlabMagicMod
 import slabmagic.helper.ColorTools
 import slabmagic.shape.painter.CircleVertexPainter
@@ -28,7 +28,7 @@ class SpellTrapRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<Spe
 
         matrix.push()
         matrix.scale(range/2, 1.0f, range/2)
-        matrix.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0f - yaw))
+        matrix.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f - yaw))
 
         val vertexes = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(this.getTexture(entity)))
 

@@ -1,7 +1,7 @@
 package slabmagic.shape.painter.vertex
 
 import net.minecraft.client.render.VertexConsumer
-import net.minecraft.util.math.Matrix4f
+import org.joml.Matrix4f
 
 class PositionColorLightVPC(val consumer: VertexConsumer, val matrix: Matrix4f) : VertexPainterConsumer {
     override fun add(x: Float, y: Float, z: Float, red: Float, green: Float, blue: Float, corner: Int) {

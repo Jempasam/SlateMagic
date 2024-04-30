@@ -7,12 +7,12 @@ import net.minecraft.entity.data.DataTracker
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.particle.BlockStateParticleEffect
 import net.minecraft.particle.ParticleTypes
+import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 import slabmagic.entity.tracked.SlabMagicTrackedData
-import slabmagic.entity.tracked.tracked
+import slabmagic.entity.tracked.provideDelegate
 import kotlin.jvm.optionals.getOrNull
 import kotlin.random.Random
 
@@ -22,11 +22,11 @@ class BlockFollowingEntity(type: EntityType<*>, world: World, var duration: Int=
         val BLOCK = DataTracker.registerData(BlockFollowingEntity::class.java, SlabMagicTrackedData.BLOCK)
     }
 
-    var block by tracked(BLOCK)
+    var block by BLOCK
 
-    override fun initDataTracker() {
-        super.initDataTracker()
-        dataTracker.startTracking(BLOCK, Blocks.AIR)
+    override fun initDataTracker(builder: DataTracker.Builder) {
+        super.initDataTracker(builder)
+        builder.add(BLOCK, Blocks.AIR)
     }
 
     override fun tickTarget(target: Entity) {
@@ -36,7 +36,7 @@ class BlockFollowingEntity(type: EntityType<*>, world: World, var duration: Int=
         }
         val block=block
         if(block!=Blocks.AIR){
-            val bpos=BlockPos(target.pos)
+            val bpos=BlockPos.ofFloored(target.pos)
             val state=block.defaultState
             block.onEntityCollision(state, world, bpos, target)
             block.onSteppedOn(world, bpos, state, target)
@@ -60,13 +60,13 @@ class BlockFollowingEntity(type: EntityType<*>, world: World, var duration: Int=
 
     override fun readCustomDataFromNbt(nbt: NbtCompound) {
         super.readCustomDataFromNbt(nbt)
-        block = nbt.getString("block") .let{Identifier.tryParse(it)} ?.let {Registry.BLOCK.getOrEmpty(it)} ?.getOrNull() ?: Blocks.AIR
+        block = nbt.getString("block") .let{Identifier.tryParse(it)} ?.let {Registries.BLOCK.getOrEmpty(it)} ?.getOrNull() ?: Blocks.AIR
         duration = nbt.getInt("duration")
     }
 
     override fun writeCustomDataToNbt(nbt: NbtCompound) {
         super.writeCustomDataToNbt(nbt)
-        if(block!=Blocks.AIR) nbt.putString("block", Registry.BLOCK.getId(block).toString())
+        if(block!=Blocks.AIR) nbt.putString("block", Registries.BLOCK.getId(block).toString())
         nbt.putInt("duration",duration)
     }
 

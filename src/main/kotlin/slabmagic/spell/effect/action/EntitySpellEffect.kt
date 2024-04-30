@@ -5,7 +5,7 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.DefaultAttributeRegistry
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.text.Text
-import net.minecraft.util.math.Vec3f
+import org.joml.Vector3f
 import slabmagic.helper.ColorTools
 import slabmagic.network.messages.sendParticleEffect
 import slabmagic.particle.SlabMagicParticles
@@ -25,7 +25,7 @@ class EntitySpellEffect(val type: EntityType<*>): SpellEffect {
             SpellCircleParticleEffect(SlabMagicParticles.SPELL_CIRCLE, shape, ColorTools.int(color), 1f, 50),
             context.pos
         )
-        return SpellContext.at(spawned, context.power)
+        return SpellContext.at(spawned, context.stored)
     }
 
     override val name: Text get() = spellName("summon_entity",type.name)
@@ -37,7 +37,7 @@ class EntitySpellEffect(val type: EntityType<*>): SpellEffect {
     private val maxHealth
         get() = (DefaultAttributeRegistry.get(type as EntityType<out LivingEntity>)?.getBaseValue(EntityAttributes.GENERIC_MAX_HEALTH)) ?: 0.0
 
-    override val color: Vec3f get() = ColorTools.vec(ColorTools.of(type))
+    override val color: Vector3f get() = ColorTools.vec(ColorTools.of(type))
 
     override val shape: SpellShape get() = SpellShape(
         Array(4) {SpellShape.Circle(8, 30, 0, 0, 1, 0, 0)}

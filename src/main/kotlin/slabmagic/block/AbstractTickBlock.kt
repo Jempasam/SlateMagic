@@ -31,8 +31,8 @@ abstract class AbstractTickBlock(settings: Settings) : Block(settings) {
             world.setBlockState(pos, state.with(TRIGGERED,false))
             return
         }
-
-        world.createAndScheduleBlockTick(pos, this, time(random))
+        
+        world.scheduleBlockTick(pos, this, time(random))
         world.setBlockState(pos, state.with(TRIGGERED,test(state,world,pos)))
     }
 
@@ -44,13 +44,13 @@ abstract class AbstractTickBlock(settings: Settings) : Block(settings) {
 
     override fun onBlockAdded(state: BlockState, world: World, pos: BlockPos, oldState: BlockState, notify: Boolean) {
         super.onBlockAdded(state, world, pos, oldState, notify)
-        if(world.getEmittedRedstonePower(pos.down(),Direction.DOWN)==0) world.createAndScheduleBlockTick(pos, this, time(Random.create()))
+        if(world.getEmittedRedstonePower(pos.down(),Direction.DOWN)==0) world.scheduleBlockTick(pos, this, time(Random.create()))
         else if(state.get(TRIGGERED))world.setBlockState(pos, state.with(TRIGGERED,false))
     }
 
     override fun neighborUpdate(state: BlockState, world: World, pos: BlockPos, sourceBlock: Block, sourcePos: BlockPos, notify: Boolean) {
         super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify)
-        if(world.getEmittedRedstonePower(pos.down(),Direction.DOWN)==0) world.createAndScheduleBlockTick(pos, this, time(Random.create()))
+        if(world.getEmittedRedstonePower(pos.down(),Direction.DOWN)==0) world.scheduleBlockTick(pos, this, time(Random.create()))
         else if(state.get(TRIGGERED))world.setBlockState(pos, state.with(TRIGGERED,false))
     }
 }

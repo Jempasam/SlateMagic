@@ -1,9 +1,10 @@
 package slabmagic.utils
 
-import net.minecraft.util.math.Vec3f
+import org.joml.Vector3f
 import java.awt.image.BufferedImage
 import java.awt.image.WritableRaster
 import kotlin.math.abs
+import kotlin.math.max
 import kotlin.math.min
 
 class ImageBuilder {
@@ -91,17 +92,33 @@ fun sCombine(vararg selectors: ImageBuilder.Selector) = ImageBuilder.Selector{ r
     true
 }
 
-fun sColor(color: Vec3f, tolerance: Float=0.1f) = ImageBuilder.Selector{ raster, x, y ->
+fun sColor(color: Vector3f, tolerance: Float=0.1f) = ImageBuilder.Selector{ raster, x, y ->
     val pixel= raster.getPixel(x,y,IntArray(4))
     val distance= abs(color.x*255-pixel[0]) + abs(color.y*255-pixel[1]) + abs(color.z*255-pixel[2])
     distance<tolerance
 }
 
-fun sTint(tint: Vec3f, tolerance: Float=0.1f) = ImageBuilder.Selector{ raster, x, y ->
+fun sTint(tint: Vector3f, tolerance: Float=0.1f) = ImageBuilder.Selector{ raster, x, y ->
     val pixel= raster.getPixel(x,y,IntArray(4))
-    val targetTint= Vec3f(pixel[0]/255f,pixel[1]/255f,pixel[2]/255f)
-    targetTint.apply { normalize() ; subtract(tint) }
+    val targetTint= Vector3f(pixel[0]/255f,pixel[1]/255f,pixel[2]/255f)
+
+    targetTint.apply { normalize() ; sub(tint) }
     val distance= abs(targetTint.x) + abs(targetTint.y) + abs(targetTint.z)
+    distance<tolerance
+}
+
+fun sHue(tint: Vector3f, tolerance: Float=0.1f) = ImageBuilder.Selector{ raster, x, y ->
+    val pixel= raster.getPixel(x,y,IntArray(4))
+    val v=Vector3f(pixel[0].toFloat(),pixel[1].toFloat(),pixel[2].toFloat())
+
+    val min= min(v.x,min(v.y,v.z))
+    v.modify{ it-min }
+
+    val max= max(v.x, max(v.y,v.z))
+    v.modify { it/max }
+
+    v.sub(tint)
+    val distance= abs(v.x) + abs(v.y) + abs(v.z)
     distance<tolerance
 }
 
@@ -112,18 +129,18 @@ fun tSequence(vararg transformers: ImageBuilder.Transformer) = ImageBuilder.Tran
     }
 }
 
-fun tTint(tint: Vec3f) = ImageBuilder.Transformer{ raster, x, y ->
+fun tTint(tint: Vector3f) = ImageBuilder.Transformer{ raster, x, y ->
     val pixel= raster.getPixel(x,y,IntArray(4))
     val targetLuminosity= (pixel[0]+pixel[1]+pixel[2])/3f
-    val newColor= Vec3f(tint.x*targetLuminosity,tint.y*targetLuminosity,tint.z*targetLuminosity)
+    val newColor= Vector3f(tint.x*targetLuminosity,tint.y*targetLuminosity,tint.z*targetLuminosity)
     raster.setPixel(x,y,intArrayOf(newColor.x.toInt(),newColor.y.toInt(),newColor.z.toInt(),pixel[3]))
 }
 
 fun tLuminosity(luminosity: Float) = ImageBuilder.Transformer{ raster, x, y ->
     val pixel= raster.getPixel(x,y,IntArray(4))
-    val targetTint= Vec3f(pixel[0].toFloat(), pixel[1].toFloat(), pixel[2].toFloat())
+    val targetTint= Vector3f(pixel[0].toFloat(), pixel[1].toFloat(), pixel[2].toFloat())
     val luminosity=luminosity*255f
-    targetTint.apply { normalize() ; multiplyComponentwise(luminosity,luminosity,luminosity) }
+    targetTint.apply { normalize() ; mul(luminosity,luminosity,luminosity) }
     raster.setPixel(x,y,intArrayOf(targetTint.x.toInt(),targetTint.y.toInt(),targetTint.z.toInt(),pixel[3]))
 }
 

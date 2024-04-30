@@ -2,7 +2,7 @@ package slabmagic.spell.effect.action
 
 import net.minecraft.text.Text
 import net.minecraft.util.DyeColor
-import net.minecraft.util.math.Vec3f
+import org.joml.Vector3f
 import slabmagic.helper.ColorTools
 import slabmagic.shape.SpellShape
 import slabmagic.spell.SpellContext
@@ -11,7 +11,7 @@ import slabmagic.spell.effect.SpellEffect
 import slabmagic.spell.spellDesc
 import slabmagic.spell.spellName
 
-class StubSpellEffect(override val color: Vec3f, override val shape: SpellShape): SpellEffect {
+class StubSpellEffect(override val color: Vector3f, override val shape: SpellShape): SpellEffect {
 
     override fun use(context: SpellContext): SpellContext? = null
 

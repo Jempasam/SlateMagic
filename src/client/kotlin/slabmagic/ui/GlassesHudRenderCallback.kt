@@ -5,7 +5,7 @@ import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.client.MinecraftClient
-import net.minecraft.client.util.math.MatrixStack
+import net.minecraft.client.gui.DrawContext
 import net.minecraft.item.ItemStack
 import net.minecraft.text.Text
 import net.minecraft.util.DyeColor
@@ -25,14 +25,14 @@ object GlassesHudRenderCallback: HudRenderCallback {
         providers.computeIfAbsent(block){ mutableListOf() }.add(provider)
     }
 
-    override fun onHudRender(matrixStack: MatrixStack, tickDelta: Float) {
+    override fun onHudRender(context: DrawContext, tickDelta: Float) {
         val mc=MinecraftClient.getInstance()
         val player=mc.player ?: return
         val mainHand=player.mainHandStack
         val offHand=player.offHandStack
         if(mainHand.isIn(SlabMagicTags.LENS) || offHand.isIn(SlabMagicTags.LENS)){
             val looked= player.raycast(6.0, tickDelta, false)
-            val bpos=BlockPos(looked.pos.add(player.rotationVector.multiply(0.1)))
+            val bpos=BlockPos.ofFloored(looked.pos.add(player.rotationVector.multiply(0.1)))
             val state= player.world.getBlockState(bpos)
             val time=System.currentTimeMillis()
             if(state.isAir)return
@@ -62,10 +62,10 @@ object GlassesHudRenderCallback: HudRenderCallback {
                     x
                 }
                 else{
-                    mc.itemRenderer.renderInGuiWithOverrides(part.stack, x, y )
+                    context.drawItem(part.stack, x, y-4)
                     x+20
                 }
-                mc.textRenderer.drawWithShadow(matrixStack, part.text, dx.toFloat(), y.toFloat()+4f, DyeColor.WHITE.fireworkColor)
+                context.drawText(mc.textRenderer, part.text, dx, y, DyeColor.WHITE.fireworkColor, true)
                 y+=20
             }
 

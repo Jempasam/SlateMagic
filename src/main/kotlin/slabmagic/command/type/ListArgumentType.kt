@@ -13,8 +13,8 @@ import net.minecraft.command.CommandRegistryAccess
 import net.minecraft.command.argument.serialize.ArgumentSerializer
 import net.minecraft.command.argument.serialize.ArgumentSerializer.ArgumentTypeProperties
 import net.minecraft.network.PacketByteBuf
+import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
-import net.minecraft.util.registry.Registry
 import java.util.concurrent.CompletableFuture
 import kotlin.math.max
 
@@ -91,14 +91,14 @@ class ListArgumentType<T, A: ArgumentType<T>>(val type: A): ArgumentType<List<T>
 
         fun <A: ArgumentType<*>, P: ArgumentTypeProperties<A>> write(properties: P, buf: PacketByteBuf){
             val serializer=properties.serializer as ArgumentSerializer<A,P>
-            val id=Registry.COMMAND_ARGUMENT_TYPE.getId(serializer)
+            val id=Registries.COMMAND_ARGUMENT_TYPE.getId(serializer)
             buf.writeString(id.toString())
             serializer.writePacket(properties,buf)
         }
 
         override fun fromPacket(packetByteBuf: PacketByteBuf): Properties {
             val id=Identifier(packetByteBuf.readString())
-            val serializer=Registry.COMMAND_ARGUMENT_TYPE.get(id)
+            val serializer=Registries.COMMAND_ARGUMENT_TYPE.get(id)
             return Properties(serializer?.fromPacket(packetByteBuf) as ArgumentTypeProperties<*>)
         }
 
@@ -108,7 +108,7 @@ class ListArgumentType<T, A: ArgumentType<T>>(val type: A): ArgumentType<List<T>
 
         fun <A: ArgumentType<*>, P: ArgumentTypeProperties<A>> write(properties: P, jsonObject: JsonObject){
             val serializer=properties.serializer as ArgumentSerializer<A,P>
-            val id=Registry.COMMAND_ARGUMENT_TYPE.getId(serializer)
+            val id=Registries.COMMAND_ARGUMENT_TYPE.getId(serializer)
             jsonObject.addProperty("type",id.toString())
             val obj=JsonObject()
             serializer.writeJson(properties,obj)

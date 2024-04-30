@@ -8,7 +8,7 @@ import net.minecraft.client.render.Camera
 import net.minecraft.client.render.VertexConsumer
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Matrix4f
+import org.joml.Matrix4f
 
 class EnergyBlockParticle(
     spriteProvider: SpriteProvider,
@@ -53,8 +53,9 @@ class EnergyBlockParticle(
 
 
         val matrix=Matrix4f()
-        matrix.loadIdentity()
-        matrix.multiplyByTranslation(f,g,h)
+        matrix.identity()
+        matrix.translateLocal(f,g,h)
+        //TODO matrix.multiplyByTranslation(f,g,h)
 
         fun VertexConsumer.point(x:Float, y:Float, z:Float, corner: Int){
             vertex(matrix,x*size,y*size,z*size)

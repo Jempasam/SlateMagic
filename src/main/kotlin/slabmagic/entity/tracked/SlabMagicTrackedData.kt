@@ -1,27 +1,39 @@
 package slabmagic.entity.tracked
 
+import io.netty.buffer.ByteBuf
+import net.minecraft.entity.Entity
+import net.minecraft.entity.data.TrackedData
 import net.minecraft.entity.data.TrackedDataHandler
 import net.minecraft.entity.data.TrackedDataHandlerRegistry
-import net.minecraft.network.PacketByteBuf
+import net.minecraft.network.codec.PacketCodec
+import net.minecraft.network.codec.PacketCodecs
+import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
-import net.minecraft.util.registry.Registry
 import slabmagic.entity.data.SpellEntity
 import slabmagic.shape.SpellShape
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 object SlabMagicTrackedData {
 
-    val SPELL_SHAPE = register( {buf,shape -> buf.writeString(shape.toCode())}, {buf -> SpellShape(buf.readString())} )
 
-    val SPELL_DATA = register( {buf,data -> data.write(buf)}, {buf -> SpellEntity.Data().apply {read(buf)} })
+    val SPELL_SHAPE= register(PacketCodecs.STRING.xmap({SpellShape(it)},{it.toCode()}))
 
-    val BLOCK = register(
-        { buf, block -> buf.writeString(Registry.BLOCK.getId(block).toString()) },
-        { buf -> Registry.BLOCK.get(Identifier(buf.readString())) }
-    )
+    val SPELL_DATA= register(PacketCodecs.codec(SpellEntity.Data.CODEC))
 
-    fun <T> register(writer: PacketByteBuf.PacketWriter<T>, reader: PacketByteBuf.PacketReader<T>): TrackedDataHandler<T> {
-        val handler=TrackedDataHandler.of(writer, reader)
+    val BLOCK= register(PacketCodecs.STRING.xmap( {Registries.BLOCK.get(Identifier(it))}, {Registries.BLOCK.getId(it).toString()} ))
+
+    fun <T> register(codec: PacketCodec<ByteBuf,T>): TrackedDataHandler<T> {
+        val handler=TrackedDataHandler.create(codec)
         TrackedDataHandlerRegistry.register(handler)
         return handler
+    }
+}
+
+operator fun <T> TrackedData<T>.provideDelegate(thisRef: Entity, prop: KProperty<*>): ReadWriteProperty<Entity,T> {
+    val handler=this
+    return object: ReadWriteProperty<Entity,T>{
+        override fun getValue(thisRef: Entity, property: KProperty<*>) = thisRef.dataTracker.get(handler)
+        override fun setValue(thisRef: Entity, property: KProperty<*>, value: T) = thisRef.dataTracker.set(handler,value)
     }
 }

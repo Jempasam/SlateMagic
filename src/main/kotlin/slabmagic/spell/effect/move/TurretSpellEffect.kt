@@ -2,7 +2,7 @@ package slabmagic.spell.effect.move
 
 import net.minecraft.text.Text
 import net.minecraft.util.math.Vec3d
-import net.minecraft.util.math.Vec3f
+import org.joml.Vector3f
 import slabmagic.entity.SlabMagicEntities
 import slabmagic.entity.SpellTurretEntity
 import slabmagic.network.messages.AdvancedParticleMessage
@@ -13,13 +13,14 @@ import slabmagic.spell.SpellContext
 import slabmagic.spell.build.AssembledSpell
 import slabmagic.spell.effect.SpellEffect
 import slabmagic.spell.times
+import slabmagic.utils.coerceIn
 import kotlin.math.sqrt
 
 class TurretSpellEffect(val cadency: Int, val count: Int, val decorated: AssembledSpell, val endSpell: AssembledSpell?=null): SpellEffect {
 
     override fun use(context: SpellContext): SpellContext {
-        val levelCount= (count*sqrt(context.power.toDouble())).toInt()
-        val trap=SpellTurretEntity(SlabMagicEntities.SPELL_TURRET, context.world, decorated, context.power, cadency, levelCount, endSpell)
+        val levelCount= (count*sqrt(context.stored.power.toDouble())).toInt()
+        val trap=SpellTurretEntity(SlabMagicEntities.SPELL_TURRET, context.world, decorated, context.stored, cadency, levelCount, endSpell)
         trap.setPosition(context.pos)
         trap.pitch=context.direction.x
         trap.yaw=context.direction.y
@@ -27,11 +28,11 @@ class TurretSpellEffect(val cadency: Int, val count: Int, val decorated: Assembl
         sendParticleEffect(context.world,
             MagicParticleEffect(color, 0.5f),
             context.pos,
-            AdvancedParticleMessage.SHOCKWAVE,
+            AdvancedParticleMessage.Shape.SHOCKWAVE,
             Vec3d(1.0,0.0,1.0),
             20.0
         )
-        return SpellContext.at(trap,context.power)
+        return SpellContext.at(trap,context.stored)
     }
 
     override val name: Text get() {
@@ -46,9 +47,9 @@ class TurretSpellEffect(val cadency: Int, val count: Int, val decorated: Assembl
 
     override val cost: Int get() = decorated.effect.cost*count
 
-    override val color: Vec3f get() = decorated.effect.color.apply {
+    override val color: Vector3f get() = decorated.effect.color.apply {
         add(-0.1f,0.1f,-0.1f)
-        clamp(0.0f,1.0f)
+        coerceIn(0.0f,1.0f)
     }
 
     override val shape: SpellShape get() = decorated.effect.shape.also {

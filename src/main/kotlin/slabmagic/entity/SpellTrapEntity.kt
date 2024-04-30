@@ -10,6 +10,8 @@ import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec2f
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
+import slabmagic.entity.data.SpellEntity
+import slabmagic.entity.tracked.provideDelegate
 import slabmagic.network.messages.AdvancedParticleMessage
 import slabmagic.network.messages.sendParticleEffect
 import slabmagic.particle.AdvancedParticle
@@ -29,24 +31,21 @@ class SpellTrapEntity : SimpleSpellEntity{
     private var remainingshoot=1
     private var time=0
 
-    var range: Float
-        get() = dataTracker.get(RANGE)
-        set(value) = dataTracker.set(RANGE, value)
+    var range by RANGE
 
     constructor(type: EntityType<*>, world: World) : super(type, world)
 
-    constructor(type: EntityType<*>, world: World, spell: AssembledSpell, power: Int, range: Float, remainingShoot: Int)
-            : super(type, world, listOf(spell), power)
+    constructor(type: EntityType<*>, world: World, spell: AssembledSpell, context: SpellContext.Stored, range: Float, remainingShoot: Int)
+            : super(type, world, SpellEntity.Data(listOf(spell), context))
     {
         this.range = range
         this.remainingshoot = remainingShoot
     }
 
-    override fun initDataTracker() {
-        super.initDataTracker()
-        dataTracker.startTracking(RANGE, 1.0f)
+    override fun initDataTracker(builder: DataTracker.Builder) {
+        super.initDataTracker(builder)
+        builder.add(RANGE, 1.0f)
     }
-
 
     override fun tick() {
         super.tick()
@@ -62,23 +61,23 @@ class SpellTrapEntity : SimpleSpellEntity{
                     val i = Random.nextInt(collisions.size)
                     val target=collisions[i]
                     lookAt(EntityAnchorArgumentType.EntityAnchor.FEET, target.pos)
-                    val context= SpellContext.at(this, power)
-                    context.markeds.addAll(markeds)
-                    context.direction= Vec2f(yaw, pitch)
+                    val context= SpellContext.at(target,stored).copy(
+                        direction = Vec2f(yaw, pitch),
+                    )
                     val result=spell.use(context)
                     if(result!=null){
                         remainingshoot--
                         sendParticleEffect(world,
                             MagicParticleEffect(spell.color, 0.5f),
                             pos,
-                            AdvancedParticleMessage.LIGHTNING,
+                            AdvancedParticleMessage.Shape.LIGHTNING,
                             target.pos,
                             5.0
                         )
                         sendParticleEffect(context.world,
                             MagicParticleEffect(spell.color, 0.5f),
                             context.pos,
-                            AdvancedParticleMessage.SHOCKWAVE,
+                            AdvancedParticleMessage.Shape.SHOCKWAVE,
                             Vec3d(range,range,range),
                             15.0*range
                         )

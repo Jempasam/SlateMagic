@@ -2,7 +2,7 @@ package slabmagic.shape.painter
 
 import net.minecraft.client.render.VertexConsumer
 import net.minecraft.util.math.ColorHelper
-import net.minecraft.util.math.Matrix4f
+import org.joml.Matrix4f
 import slabmagic.shape.SpellShape
 import kotlin.math.sqrt
 

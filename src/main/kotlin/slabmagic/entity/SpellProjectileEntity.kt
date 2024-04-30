@@ -13,6 +13,7 @@ import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 import slabmagic.entity.data.SpellEntity
 import slabmagic.entity.tracked.SlabMagicTrackedData
+import slabmagic.entity.tracked.provideDelegate
 import slabmagic.particle.MagicParticleEffect
 import slabmagic.spell.SpellContext
 import slabmagic.spell.build.AssembledSpell
@@ -21,22 +22,27 @@ class SpellProjectileEntity : ThrownEntity, SpellEntity {
 
 
     companion object{
-        val SPELL_DATA = DataTracker.registerData(SimpleSpellEntity::class.java, SlabMagicTrackedData.SPELL_DATA)
+        val SPELL_DATA = DataTracker.registerData(SpellProjectileEntity::class.java, SlabMagicTrackedData.SPELL_DATA)
     }
 
 
     private var maxage=0
 
+    override var spellData by SPELL_DATA
+
+    override fun initDataTracker(builder: DataTracker.Builder) {
+        builder.add(SPELL_DATA, SpellEntity.Data())
+    }
+
 
     constructor(type: EntityType<out SpellProjectileEntity>, world: World)
             : super(type, world)
 
-    constructor(type: EntityType<out SpellProjectileEntity>, world: World, spell: AssembledSpell, power: Int, maxage: Int)
+    constructor(type: EntityType<out SpellProjectileEntity>, world: World, spell: AssembledSpell, context: SpellContext.Stored, maxage: Int)
             : super(type, world)
     {
         this.maxage = maxage
-        this.spellData.spell=spell
-        this.spellData.power=power
+        this.spellData=SpellEntity.Data(listOf(spell),context)
     }
 
     fun setVelocity(pitch: Float, yaw: Float, speed: Float, divergence: Float) {
@@ -62,8 +68,7 @@ class SpellProjectileEntity : ThrownEntity, SpellEntity {
     override fun onEntityHit(entityHitResult: EntityHitResult) {
         super.onEntityHit(entityHitResult)
         if(!world.isClient){
-            val context=SpellContext.at(entityHitResult.entity, power)
-            context.markeds.addAll(markeds)
+            val context=SpellContext.at(entityHitResult.entity, stored)
             context.direction= Vec2f(-pitch, -yaw)
             spell.use(context)
             kill()
@@ -80,17 +85,10 @@ class SpellProjectileEntity : ThrownEntity, SpellEntity {
     fun onPos(pos: Vec3d){
         val rotation=Vec2f(-pitch,-yaw)
         if(!world.isClient) {
-            val ctx=SpellContext.at(world as ServerWorld, pos, rotation, power)
-            ctx.markeds.addAll(markeds)
+            val ctx=SpellContext.at(world as ServerWorld, pos, rotation, stored)
             spell.use(ctx)
             kill()
         }
-    }
-
-    override val spellData get() = dataTracker[SPELL_DATA]
-
-    override fun initDataTracker() {
-        dataTracker.startTracking(SPELL_DATA, SpellEntity.Data())
     }
 
     override fun readCustomDataFromNbt(nbt: NbtCompound) {

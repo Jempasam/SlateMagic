@@ -7,7 +7,7 @@ import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3f
+import net.minecraft.util.math.RotationAxis
 import slabmagic.SlabMagicMod
 import slabmagic.helper.ColorTools
 import slabmagic.shape.painter.CrossedVertexPainter
@@ -25,8 +25,8 @@ class SpellCrossedRenderer(ctx: EntityRendererFactory.Context, val factory: Fact
         val z = MathHelper.lerp(tickDelta.toDouble(), entity.lastRenderZ, entity.z)
 
         matrix.push()
-        matrix.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0f - yaw))
-        matrix.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(entity.pitch))
+        matrix.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f - yaw))
+        matrix.multiply(RotationAxis.POSITIVE_X.rotationDegrees(entity.pitch))
         matrix.scale(factory.size, factory.size, factory.size)
         val vertexs = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(this.getTexture(entity)))
         val panter=CrossedVertexPainter(EntityVPC(vertexs,matrix.peek().positionMatrix), ColorTools.int(spell.color),0.1f)

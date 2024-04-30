@@ -6,6 +6,7 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
+import slabmagic.entity.data.SpellEntity
 import slabmagic.helper.asAngle
 import slabmagic.helper.minus
 import slabmagic.network.messages.AdvancedParticleMessage
@@ -20,8 +21,8 @@ class SpellShieldEntity : SpellFollowingEntity{
 
     constructor(type: EntityType<*>, world: World) : super(type, world)
 
-    constructor(type: EntityType<*>, world: World, spell: AssembledSpell, power: Int, range: Float, remainingShoot: Int, endSpell: AssembledSpell?=null)
-            : super(type, world, listOfNotNull(spell,endSpell), power, range)
+    constructor(type: EntityType<*>, world: World, spell: AssembledSpell, context: SpellContext.Stored, range: Float, remainingShoot: Int, endSpell: AssembledSpell?=null)
+            : super(type, world, SpellEntity.Data(listOfNotNull(spell,endSpell), context), range)
     {
         this.range = range
         this.remainingshoot = remainingShoot
@@ -41,16 +42,15 @@ class SpellShieldEntity : SpellFollowingEntity{
                 val direction= (attacker.eyePos-target.eyePos).asAngle()
 
                 // Context
-                val context= SpellContext.atEye(target,power)
+                val context= SpellContext.atEye(target,stored)
                 context.direction=direction
-                context.markeds.addAll(markeds)
 
                 val spell=if(spells.size>1 && remainingshoot==1) spells[1].effect else spells[0].effect
                 spell.use(context)
                 sendParticleEffect(context.world,
                     MagicParticleEffect(spell.color, 0.5f),
                     context.pos,
-                    AdvancedParticleMessage.SHOCKWAVE,
+                    AdvancedParticleMessage.Shape.SHOCKWAVE,
                     Vec3d(range,0.0,range),
                     15.0*range
                 )

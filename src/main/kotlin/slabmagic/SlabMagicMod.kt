@@ -8,9 +8,12 @@ import slabmagic.block.SlabMagicBlocks
 import slabmagic.block.entity.SlabMagicBlockEntities
 import slabmagic.command.SlabMagicCommands
 import slabmagic.command.type.SlabMagicArgumentTypes
+import slabmagic.components.SlabMagicComponents
 import slabmagic.entity.SlabMagicEntities
 import slabmagic.entity.tracked.SlabMagicTrackedData
 import slabmagic.item.SlabMagicItems
+import slabmagic.item.group.SlabMagicGroups
+import slabmagic.network.SlabMagicNetwork
 import slabmagic.particle.SlabMagicParticles
 import slabmagic.registry.SlabMagicRegistry
 import slabmagic.spell.build.parts.SlabMagicSpellParts
@@ -23,6 +26,7 @@ object SlabMagicMod : ModInitializer {
 
 	override fun onInitialize() {
 		logger.info("Initialization!")
+		SlabMagicComponents
 		SlabMagicTrackedData
 		SlabMagicEntities
 		SlabMagicParticles
@@ -33,6 +37,8 @@ object SlabMagicMod : ModInitializer {
 		SlabMagicSpellParts
 		SlabMagicBlockEntities
 		SlabMagicItems
+		SlabMagicGroups
+		SlabMagicNetwork
 	}
 
 	/* TOOLS */

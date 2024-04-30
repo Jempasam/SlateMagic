@@ -1,19 +1,21 @@
 package slabmagic.datagen
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider
 import net.minecraft.block.Block
-import net.minecraft.tag.BlockTags
-import net.minecraft.util.registry.Registry
+import net.minecraft.registry.RegistryKeys
+import net.minecraft.registry.RegistryWrapper
+import net.minecraft.registry.tag.BlockTags
 import slabmagic.block.SlabMagicBlocks
+import java.util.concurrent.CompletableFuture
 
-fun <T> FabricTagProvider<*>.FabricTagBuilder<T>.addAll(iterable: Iterable<T>): FabricTagProvider<*>.FabricTagBuilder<T>{
+fun <T> FabricTagProvider<T>.FabricTagBuilder.addAll(iterable: Iterable<T>): FabricTagProvider<T>.FabricTagBuilder{
     iterable.forEach { add(it) }
     return this
 }
 
-class SlabMagicBlockTagGenerator(dataGenerator: FabricDataGenerator) : FabricTagProvider<Block>(dataGenerator, Registry.BLOCK) {
-    override fun generateTags() {
+class SlabMagicBlockTagGenerator(dataGenerator: FabricDataOutput, reg: CompletableFuture<RegistryWrapper.WrapperLookup>) : FabricTagProvider<Block>(dataGenerator, RegistryKeys.BLOCK, reg) {
+    override fun configure(wrapperLookup: RegistryWrapper.WrapperLookup){
         getOrCreateTagBuilder(BlockTags.PICKAXE_MINEABLE)
 
             .add(SlabMagicBlocks.REDSTONE_HEART)
